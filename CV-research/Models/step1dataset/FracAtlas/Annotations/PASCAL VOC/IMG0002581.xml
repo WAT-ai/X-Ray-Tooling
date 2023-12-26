@@ -1,0 +1,37 @@
+<annotation>
+  <folder>PASCAL VOC</folder>
+  <filename>IMG0002581.jpg</filename>
+  <source>
+    <database>MLBFR</database>
+  </source>
+  <size>
+    <width>373</width>
+    <height>454</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>fractured</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>85</xmin>
+      <ymin>167</ymin>
+      <xmax>99</xmax>
+      <ymax>208</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>fractured</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>308</xmin>
+      <ymin>148</ymin>
+      <xmax>323</xmax>
+      <ymax>174</ymax>
+    </bndbox>
+  </object>
+</annotation>
