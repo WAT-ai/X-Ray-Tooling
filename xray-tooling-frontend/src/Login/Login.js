@@ -51,6 +51,9 @@ import {
   AppBar,
   Toolbar,
 } from '@mui/material';
+import { auth } from "../firebase";
+import {signInWithEmailAndPassword} from "firebase/auth"
+import { Route, useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -64,26 +67,33 @@ const Login = () => {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
+  let navigate = useNavigate();
 
   const handleLogin = () => {
-    // Here you can implement your login logic.
-    // For simplicity, we'll just show an alert.
-    if (email && password) {
-      setShowAlert(false); // Hide any previous alerts
-      setAlertMessage('Login successful'); // Message for successful login
-      setShowAlert(true);
-    } else {
-      setShowAlert(false); // Hide any previous alerts
-      setAlertMessage('Please enter both email and password.'); // Error message
-      setShowAlert(true);
-    }
+    
+    signInWithEmailAndPassword(auth,email,password) //sends email and password to firebase to be created
+        .then((userCredential) => {
+            // Signed in
+            // var user = userCredential.user;
+            // setShowAlert(false)
+            // setUserid(user.uid)
+            console.log('Authenticated');
+            navigate('/Stepone');
+        })
+        .catch((error) => {
+            var errorCode = String(error.code);
+            console.log(error.message)
+            // setShowAlert(true)
+            // setAlertMessage(error.message)
+            console.error('Firebase Error: ', error);
+        });
   };
 
   return (
     <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px' }}>
-       <AppBar position="static">
+       <AppBar position="static" style={{ background: 'Yellow' }}>
         <Toolbar>
-          <Typography variant="h6">Welcome to XRAY Tooling Project</Typography>
+          <Typography style={{ color: 'Black' }} variant="h6">Welcome to XRAY Tooling Project</Typography>
         </Toolbar>
       </AppBar>
       <Typography variant="h4">Login</Typography>

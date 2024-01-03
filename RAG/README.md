@@ -9,7 +9,7 @@ Sprains:
 Mayo Foundation for Medical Education and Research. (2022, October 27). Sprains. Mayo Clinic. https://www.mayoclinic.org/diseases-conditions/sprains/symptoms-causes/syc-20377938
 
 Bruises:
-professional, C. C. medical. (n.d.). Bruises (ecchymosis): Symptoms, causes, treatment &amp; prevention. Cleveland Clinic. https://my.clevelandclinic.org/health/diseases/15235-bruises 
+professional, C. C. medical. (n.d.). Bruises (ecchymosis): Symptoms, causes, treatment &amp; prevention. Cleveland Clinic. https://my.clevelandclinic.org/health/diseases/15235-bruises
 
 ## To do:
 
@@ -22,3 +22,19 @@ professional, C. C. medical. (n.d.). Bruises (ecchymosis): Symptoms, causes, tre
 3. Build a webscraping tool to automage ingestion
 4. Integrate with GPT api to compare performance
 5. Prompt engineering to iterate on quality of cohere calls
+
+# To run a batch job of embeddings creation:
+
+`python pubmed_embeddings.py --run_batch`
+
+This should take around 10-20 minutes.
+
+# To build vector index:
+
+`python pubmed_embeddings.py --build_index`
+
+This should be under a minute
+
+# To run similarity search:
+
+`python pubmed_embeddings.py --similarity_search`
