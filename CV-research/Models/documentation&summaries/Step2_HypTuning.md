@@ -19,3 +19,4 @@ From these results, it seems like batch size didn't matter as there were success
 
 ## Stage 2 Hyperparameter Tuning Results
 
+I set a fixed seed in models 1, 2, and 9 to ensure that initialization of weights are consistent amongst all the models to further compare the three. Based on testing accuracy results, model 9 was the best. 
