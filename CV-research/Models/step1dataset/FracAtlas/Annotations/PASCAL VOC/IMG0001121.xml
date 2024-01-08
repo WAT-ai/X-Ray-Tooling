@@ -1,0 +1,13 @@
+<annotation>
+  <folder>PASCAL VOC</folder>
+  <filename>IMG0001121.jpg</filename>
+  <source>
+    <database>MLBFR</database>
+  </source>
+  <size>
+    <width>373</width>
+    <height>454</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+</annotation>

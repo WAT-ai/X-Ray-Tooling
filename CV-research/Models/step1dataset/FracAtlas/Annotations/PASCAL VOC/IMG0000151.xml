@@ -1,0 +1,25 @@
+<annotation>
+  <folder>PASCAL VOC</folder>
+  <filename>IMG0000151.jpg</filename>
+  <source>
+    <database>MLBFR</database>
+  </source>
+  <size>
+    <width>2304</width>
+    <height>2880</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>fractured</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>961</xmin>
+      <ymin>1040</ymin>
+      <xmax>1066</xmax>
+      <ymax>1380</ymax>
+    </bndbox>
+  </object>
+</annotation>
