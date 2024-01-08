@@ -1,0 +1,5 @@
+{
+    "bruises": "bruises_cleveland_clinic.txt",
+    "fractures": "fractures_bssh.txt",
+    "sprains": "sprains_mayo_clinic.txt"
+}
