@@ -15,4 +15,5 @@ To setup backend and frontend:
 2. uvicorn app:app --reload
 3. cd ..
 4. cd ./xray-tooling-frontend
-5. npm start
+5. npm install
+6. npm start
