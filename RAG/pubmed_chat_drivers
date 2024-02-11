@@ -1,0 +1,41 @@
+import argparse
+from pubmed_embedding import PubmedEmbedding
+
+def main():
+    # Initialize PubmedEmbedding class
+    pe = PubmedEmbedding()
+
+    while True:
+        user_input = input("User: ")
+
+        if user_input.lower() in ['quit', 'q']:
+            print("Ending chat.")
+            break
+
+        # Check if user input should trigger Cohere or OpenAI response
+        if args.openai_response:
+            # Run similarity search using OpenAI
+            result = pe.run_similarity_search(user_input)
+            pe.results_to_json(result)
+            docs = pe.load_file()
+            response = pe.nlp_openai(docs, user_input)
+        elif args.cohere_response:
+            # Run similarity search using Cohere
+            with open("RAG/datasets/results.json", "r") as json_file:
+                docs = json.load(json_file)
+            docs = [{"snippet": value} for value in docs.values()]
+            response = pe.nlp_cohere(docs, user_input)
+        else:
+            response = "Please specify either OpenAI or Cohere for response."
+
+        print("Chatbot:", response)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Chat Driver")
+    parser.add_argument("-o", "--openai_response", action="store_true",
+                        help="Run similarity search and response text from OpenAI")
+    parser.add_argument("-c", "--cohere_response", action="store_true",
+                        help="Run similarity search and response text from Cohere")
+    args = parser.parse_args()
+    
+    main()
