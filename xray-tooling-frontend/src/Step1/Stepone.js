@@ -88,7 +88,12 @@ const Stepone = () => {
   }; 
   
   const handleResults = () => {
+<<<<<<< Updated upstream
     
+=======
+    handleSubmit();
+    navigate('/Results', { state: { image } });
+>>>>>>> Stashed changes
   };
 
   const handleRAG = () => {
