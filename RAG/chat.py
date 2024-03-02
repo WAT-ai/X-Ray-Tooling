@@ -13,7 +13,7 @@ from RAG.chroma_embedding import ChromaEmbedding
 from RAG.index_embedding import IndexEmbedding
 from abc import ABC, abstractmethod
 from RAG.flows import FlowType, Flow
-import langchain 
+import langchain
 from operator import itemgetter
 
 
@@ -68,7 +68,8 @@ class Chat():
         self.__key = os.getenv(f'{llm.upper()}_API_KEY')
 
         if llm == "openai":
-            self.__client = ChatOpenAI(temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview")
+            self.__client = ChatOpenAI(
+                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview")
         elif llm == "cohere":
             self.__client = Cohere()
 
@@ -107,8 +108,8 @@ class Chat():
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
         chain = load_qa_chain(self.__client, chain_type="stuff")
         out = chain.run(input_documents=docs, question=query)
-        return out
-    
+        return [out, docs]
+
     def stream_query(self, query):
         """
         Stream a query using OpenAI's language model.
@@ -124,12 +125,12 @@ class Chat():
         docs = [Document(page_content=doc[2], metadata={
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
         chain = load_qa_chain(self.__client, chain_type="stuff")
-        response = chain.stream({"input_documents":docs, "question":query}, return_only_outputs=True)
+        response = chain.stream(
+            {"input_documents": docs, "question": query}, return_only_outputs=True)
 
         for chunk in response:
             current_content = chunk
             yield current_content["output_text"]
-
 
     def flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
         """
@@ -150,7 +151,7 @@ class Chat():
         print(f"Templated Query: {flow_query}")
 
         out = self.__chain.invoke({"template": flow_query, "documents": docs})
-        return out
+        return [out, docs]
 
     def stream_flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
         """

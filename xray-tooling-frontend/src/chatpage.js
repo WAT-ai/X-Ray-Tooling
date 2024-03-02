@@ -1,125 +1,131 @@
-import React, { useState } from 'react';
-import './chatpage.css';
+import React, { useState } from "react";
+import "./chatpage.css";
 
 const ChatScreen = () => {
-  const [activeFlow, setActiveFlow] = useState('Agent'); 
+  const [activeFlow, setActiveFlow] = useState("Agent");
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
 
-  const [injury, setInjury] = useState('');
-  const [injuryLocation, setInjuryLocation] = useState('');
-  const [flowMessage, setFlowMessage] = useState('')
+  const [injury, setInjury] = useState("");
+  const [injuryLocation, setInjuryLocation] = useState("");
+  const [flowMessage, setFlowMessage] = useState("");
 
-  const [model, setModel] = useState('openai');
+  const [model, setModel] = useState("openai");
 
-  const [data, setData] = useState('');
+  const [data, setData] = useState("");
 
+  const sendQuery = async () => {
+    if (input.trim() !== "") {
+      const newMessage = { text: input, sender: "user" };
+      setMessages((messages) => [...messages, newMessage]);
+      setInput("");
 
-const sendQuery = async () => {
-  if (input.trim() !== '') {
-    const newMessage = { text: input, sender: 'user' };
-    setMessages(messages => [...messages, newMessage]);
-    setInput(''); 
+      try {
+        const response = await fetch("http://127.0.0.1:8000/rag/query", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: input.trim(), model: model }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log("RAG run:", data);
+          setData(data);
+          console.log("Current Vectors:", data.response[1]);
+          const serverMessage = { text: data.response[0], sender: "bot" };
+          setMessages((messages) => [...messages, serverMessage]); // Add new server message to the conversation
+        }
+      } catch (error) {
+        console.error("Error running RAG:", error);
+      }
+    }
+  };
+
+  const sendFlowQuery = async (flow) => {
+    if (injury.trim() == "" || injuryLocation.trim() == "") return;
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/rag/query', {
-        method: 'POST',
+      // set loading
+      setFlowMessage("Loading...");
+      const response = await fetch("http://127.0.0.1:8000/rag/flow", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: input.trim(), model: model }),
+        body: JSON.stringify({
+          injury: injury,
+          injury_location: injuryLocation,
+          flow: flow,
+          model: model,
+        }),
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('RAG run:', data);
+        console.log("RAG run:", data);
         setData(data);
-        const serverMessage = { text: data.response, sender: 'bot' };
-        setMessages(messages => [...messages, serverMessage]); // Add new server message to the conversation
+        console.log("Saved data: ", data);
+        console.log("New Vectors:", data.vectors);
+        const serverMessage = { text: data.content, sender: "bot" };
+        setFlowMessage(serverMessage.text); // Add new server message to the conversation
       }
     } catch (error) {
-      console.error('Error running RAG:', error);
+      console.error("Error running RAG:", error);
     }
-  }
-};
+  };
 
+  const sendFlowStream = async (flow) => {
+    if (injury.trim() == "" || injuryLocation.trim() == "") return;
+    try {
+      // set loading
+      setFlowMessage("Loading...");
+      const response = await fetch("http://127.0.0.1:8000/rag/flow", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          injury: injury,
+          injury_location: injuryLocation,
+          flow: flow,
+          model: model,
+        }),
+      });
 
-const sendFlowQuery = async (flow) => {
-  if (injury.trim() == '' || injuryLocation.trim() == '') return;
-
-
-  try {
-    // set loading
-    setFlowMessage("Loading...");
-    const response = await fetch('http://127.0.0.1:8000/rag/flow', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ injury: injury, injury_location: injuryLocation, flow: flow, model: model }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log('RAG run:', data);
-      setData(data);
-      const serverMessage = { text: data.response.content, sender: 'bot' };
-      setFlowMessage(serverMessage.text); // Add new server message to the conversation
+      const reader = response.body.getReader();
+      const chunks = [];
+    } catch (error) {
+      console.error("Error running RAG:", error);
     }
-  } catch (error) {
-    console.error('Error running RAG:', error);
-  }
-  
-};
-
-const sendFlowStream = async (flow) => {
-  if (injury.trim() == '' || injuryLocation.trim() == '') return;
-  try {
-    // set loading
-    setFlowMessage("Loading...");
-    const response = await fetch('http://127.0.0.1:8000/rag/flow', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ injury: injury, injury_location: injuryLocation, flow: flow, model: model }),
-    });
-
-    const reader = response.body.getReader();
-    const chunks = [];
-    
-
-  } catch (error) {
-    console.error('Error running RAG:', error);
-  }
-  
-};
+  };
 
   const renderActiveFlow = () => {
     switch (activeFlow) {
-      case 'Agent':
-          return (
-            <div className="chat-screen">
-              <div className="messages">
-                {messages.map((message, index) => (
-                  <div key={index} className={`message ${message.sender}`}>
-                    {message.text}
-                  </div>
-                ))}
-              </div>
-              <div className="input-area">
-                <input
-                  type="text"
-                  placeholder="Type a message..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                />
-                <button onClick={sendQuery}>Send</button>
-              </div>
-            </div>
-          );
-
-      case 'Flows':
+      case "Agent":
         return (
-          <div className="chat-screen" style={{width:"70%"}}>
+          <div className="chat-screen">
+            <div className="messages">
+              {messages.map((message, index) => (
+                <div key={index} className={`message ${message.sender}`}>
+                  {message.text}
+                </div>
+              ))}
+            </div>
+            <div className="input-area">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+              <button onClick={sendQuery}>Send</button>
+            </div>
+          </div>
+        );
+
+      case "Flows":
+        return (
+          <div className="chat-screen" style={{ width: "70%" }}>
             <div className="input-area">
               <input
                 type="text"
@@ -138,14 +144,22 @@ const sendFlowStream = async (flow) => {
             </div>
             <div className="input-area">
               <button onClick={() => sendFlowQuery("base")}>Base Flow</button>
-              <button onClick={() => sendFlowQuery("restriction")}>Restriction Flow</button>
-              <button onClick={() => sendFlowQuery("heat_ice")}>Heat & Ice Flow</button>
-              <button onClick={() => sendFlowQuery("expectation")}>Expectation Flow</button>
+              <button onClick={() => sendFlowQuery("restriction")}>
+                Restriction Flow
+              </button>
+              <button onClick={() => sendFlowQuery("heat_ice")}>
+                Heat & Ice Flow
+              </button>
+              <button onClick={() => sendFlowQuery("expectation")}>
+                Expectation Flow
+              </button>
             </div>
-            <div className="messages" style={{width: "fit"}}>
-              <p style={{color:"black", flex: 1, flexWrap: 'wrap'}}>{flowMessage}</p>
+            <div className="messages" style={{ width: "fit" }}>
+              <p style={{ color: "black", flex: 1, flexWrap: "wrap" }}>
+                {flowMessage}
+              </p>
             </div>
-        </div>
+          </div>
         );
 
       default:
@@ -156,9 +170,10 @@ const sendFlowStream = async (flow) => {
   return (
     <div>
       <div className="top-bar">
-        <button onClick={() => setActiveFlow('Agent')}>General Chat Agent</button>
-        <button onClick={() => setActiveFlow('Flows')}>Other Flows</button>
-        {/* add more flows here */}
+        <button onClick={() => setActiveFlow("Agent")}>
+          General Chat Agent
+        </button>
+        <button onClick={() => setActiveFlow("Flows")}>Other Flows</button>
       </div>
       {renderActiveFlow()}
     </div>
