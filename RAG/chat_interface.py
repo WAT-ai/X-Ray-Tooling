@@ -12,7 +12,7 @@ from chroma_embedding import ChromaEmbedding
 from index_embedding import IndexEmbedding
 from abc import ABC, abstractmethod
 from flows import FlowType, Flow
-import langchain 
+import langchain
 from langchain_community.llms import Cohere
 from operator import itemgetter
 
@@ -24,16 +24,17 @@ langchain.debug = True
 class Chain:
 
     def format_documents(docs: list[Document]):
-        formatted = [f"Relevant Document {i}:\n{doc.page_content}" for i, doc in enumerate(docs)]
+        formatted = [
+            f"Relevant Document {i}:\n{doc.page_content}" for i, doc in enumerate(docs)]
 
         return "\n\n".join(formatted)
-
 
     @classmethod
     def get_chain(cls, llm_client: object):
         prompt = ChatPromptTemplate.from_template(Flow.root())
         chain = (
-            {"template": itemgetter("template"), "documents": itemgetter("documents") | RunnableLambda(cls.format_documents)}
+            {"template": itemgetter("template"), "documents": itemgetter(
+                "documents") | RunnableLambda(cls.format_documents)}
             | prompt
             | llm_client
         )
@@ -48,14 +49,12 @@ class Chat(ABC):
         """
         pass
 
-
     @abstractmethod
     def end_chat(self) -> None:
         """
         Cleans up resources
         """
         pass
-
 
 
 class Cohere_LLM(Chat):
@@ -74,8 +73,6 @@ class Cohere_LLM(Chat):
     __co = Client(__cohere_key)
     __conversation_id = str(uuid.uuid4())
 
-
-
     def __init__(self, chroma_embedding=True, use_openai=False, chunking_max_tokens=100, num_matches=5, max_tokens=500, dataset_path="RAG/datasets/"):
         """
         Initializes the Cohere class, setting up the embedding model used for queries.
@@ -91,16 +88,16 @@ class Cohere_LLM(Chat):
         self.__embedding = None
         if chroma_embedding:
             self.__embedding = ChromaEmbedding(
-                 use_open_ai=use_openai,
-                 num_matches=num_matches,
-                 dataset_path=dataset_path
+                use_openai=use_openai,
+                num_matches=num_matches,
+                dataset_path=dataset_path
             )
         else:
             self.__embedding = IndexEmbedding(
-                 use_openai=use_openai,
-                 chunking_max_tokens=chunking_max_tokens,
-                 num_matches=num_matches,
-                 dataset_path=dataset_path
+                use_openai=use_openai,
+                chunking_max_tokens=chunking_max_tokens,
+                num_matches=num_matches,
+                dataset_path=dataset_path
             )
 
     def query(self, query) -> str:
@@ -122,14 +119,14 @@ class Cohere_LLM(Chat):
             max_tokens=self.__max_tokens,
         )
         return response.text
-    
 
     def end_chat(self) -> None:
         """
         Cleans up resources
         """
         self.__embedding.clear()
-    
+
+
 class OpenAI_LLM(Chat):
     """
     A class that integrates with OpenAI's language models for question answering purposes.
@@ -141,7 +138,8 @@ class OpenAI_LLM(Chat):
     """
     dotenv.load_dotenv()
     __open_api_key = os.getenv('OPENAI_API_KEY')
-    __open_llm = OpenAI(temperature=0, openai_api_key=__open_api_key, verbose=True)
+    __open_llm = OpenAI(
+        temperature=0, openai_api_key=__open_api_key, verbose=True)
     __chain = Chain.get_chain(__open_llm)
 
     def __init__(self, chroma_embedding=True, use_openai=False, chunking_max_tokens=100, num_matches=5, dataset_path="RAG/datasets/") -> None:
@@ -158,16 +156,16 @@ class OpenAI_LLM(Chat):
         self.__embedding = None
         if chroma_embedding:
             self.__embedding = ChromaEmbedding(
-                 use_open_ai=use_openai,
-                 num_matches=num_matches,
-                 dataset_path=dataset_path
+                use_openai=use_openai,
+                num_matches=num_matches,
+                dataset_path=dataset_path
             )
         else:
             self.__embedding = IndexEmbedding(
-                 use_openai=use_openai,
-                 chunking_max_tokens=chunking_max_tokens,
-                 num_matches=num_matches,
-                 dataset_path=dataset_path
+                use_openai=use_openai,
+                chunking_max_tokens=chunking_max_tokens,
+                num_matches=num_matches,
+                dataset_path=dataset_path
             )
 
     def query(self, query) -> object:
@@ -182,23 +180,25 @@ class OpenAI_LLM(Chat):
         """
         rag_docs = self.__embedding.get_similar_documents(query)
 
-        docs = [Document(page_content=doc[2], metadata={"chunk": doc[1], "source": "local"}) for doc in rag_docs]
+        docs = [Document(page_content=doc[2], metadata={
+                         "chunk": doc[1], "source": "local"}) for doc in rag_docs]
         chain = load_qa_chain(self.__open_llm, chain_type="stuff")
         out = chain.run(input_documents=docs, question=query)
-        return out    
-    
+        return out
+
     def end_chat(self) -> None:
         """
         Cleans up resources.
         """
         self.__embedding.clear()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     chat = None
     parser = argparse.ArgumentParser(description="X Ray Tooling LLM driver")
 
     # Option to choose between OpenAI and HuggingFace embeddings
-    parser.add_argument('--use_open_ai_embeddings', action='store_true',
+    parser.add_argument('--use_openai_embeddings', action='store_true',
                         help="Use OpenAI embeddings instead of HuggingFace's")
     # Option to choose between vector index and chroma and HuggingFace embeddings
     parser.add_argument('--use_chroma', action='store_true',
@@ -211,11 +211,9 @@ if __name__=="__main__":
 
     # Handle operations
     if args.use_cohere:
-        chat = Cohere(args.use_chroma, args.use_open_ai_embeddings)
+        chat = Cohere(args.use_chroma, args.use_openai_embeddings)
     else:
-        chat = OpenAI_LLM(args.use_chroma, args.use_open_ai_embeddings)
-
-
+        chat = OpenAI_LLM(args.use_chroma, args.use_openai_embeddings)
 
     while True:
         # Get the user message

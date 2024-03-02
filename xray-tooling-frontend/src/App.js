@@ -5,6 +5,7 @@ import Login from './Login/Login';
 import Stepone from './Step1/Stepone';
 import ChatScreen from './chatpage';
 import SignUp from './SignUp'
+import Results from './Results/Results'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/RAG" element={<ChatScreen />} />
             <Route path="/SignUp" element={<SignUp />} />
             <Route path="/Login" element={<Login />} />
+            <Route path="/Results" element={<Results />} />
           </Routes>
         </header>
       </div>

@@ -32,7 +32,7 @@ Use the following flags to change options:
 
 `--use_chroma` will use the chroma embedding db instead of a vector index
 
-`--use_open_ai_embeddings` will use open ai embeddings instead of huggingface embeddings
+`--use_openai_embeddings` will use open ai embeddings instead of huggingface embeddings
 
 # To run a chat through cli:
 
@@ -43,7 +43,7 @@ Use the following flags to change options:
 
 `--use_chroma` will use the chroma embedding db instead of a vector index
 
-`--use_open_ai_embeddings` will use open ai embeddings instead of huggingface embeddings
+`--use_openai_embeddings` will use open ai embeddings instead of huggingface embeddings
 
 ## Using the ChromaEmbedding Script
 
@@ -52,7 +52,7 @@ The `ChromaEmbedding` script allows for various operations related to embedding 
 1. **Building the Chroma DB with OpenAI Embeddings:**
    To initialize and populate the Chroma database using OpenAI embeddings, run:
 
-   `python RAG/chroma_embedding.py --use_open_ai build`
+   `python RAG/chroma_embedding.py --use_openai build`
 
 2. **Loading the Chroma DB:**
    To load the existing Chroma database, use:
@@ -62,7 +62,7 @@ The `ChromaEmbedding` script allows for various operations related to embedding 
 3. **Retrieving Documents Based on a Query with OpenAI Embeddings:**
    For retrieving documents similar to a provided query using OpenAI embeddings, execute:
 
-   `python RAG/chroma_embedding.py --use_open_ai retrieve "your query here"`
+   `python RAG/chroma_embedding.py --use_openai retrieve "your query here"`
 
 4. **Reuploading Documents to Chroma:**
    To clear the current Chroma database and re-upload documents, run:

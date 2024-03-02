@@ -9,7 +9,7 @@ from scipy import spatial
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter, NLTKTextSplitter, SpacyTextSplitter
-from embedding import Embedding
+from RAG.embedding import Embedding
 
 
 class IndexEmbedding(Embedding):
@@ -48,7 +48,7 @@ class IndexEmbedding(Embedding):
     ) -> None:
         """
         Args:
-            use_open_ai (bool): If True, sets OpenAI embeddings.
+            use_openai (bool): If True, sets OpenAI embeddings.
             chunking_max_tokens (int): the number of words to be considered a chunk
             num_matches (int): number of matching chunks to be returned upon a query
             dataset_path (str [Path]): path to the folder where all datasets will be stored
@@ -118,7 +118,6 @@ class IndexEmbedding(Embedding):
             tokens (list of str): The list of tokens to be chunked.
         """
         return [tokens[i:i+self.__chunking_max_tokens] for i in range(0, len(tokens), self.__chunking_max_tokens)]
-    
 
     chunk_types = {
         "character_splitter": CharacterTextSplitter,
@@ -140,8 +139,6 @@ class IndexEmbedding(Embedding):
         text_splitter = self.chunk_types[chunk_type]()
         docs = text_splitter.split_text(page)
         return docs
-    
-
 
     def __create_chunked_dataset(self) -> None:
         """
