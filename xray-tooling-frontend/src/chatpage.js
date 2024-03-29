@@ -88,6 +88,8 @@ const ChatScreen = () => {
 
   }, [isSaved]);
 
+
+  //branch test
   const sendQuery = async () => {
     if (input.trim() !== "") {
       const newMessage = { text: input, sender: "user" };

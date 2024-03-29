@@ -8,3 +8,4 @@ fastapi
 openai
 python-multipart
 chromadb
+scipy
