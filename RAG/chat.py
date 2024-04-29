@@ -40,7 +40,6 @@ class Chain:
                 "documents") | RunnableLambda(cls.format_documents)}
             | prompt
             | llm_client
-            | StrOutputParser()
         )
         return chain
     
@@ -67,13 +66,13 @@ class Chat():
             num_matches (int): Number of matching documents to return upon a query.
             dataset_path (str [Path]): Path to the dataset directory.
         """
-        self.__callback = AsyncIteratorCallbackHandler()
+        
         dotenv.load_dotenv()
         self.__key = os.getenv(f'{llm.upper()}_API_KEY')
 
         if llm == "openai":
             self.__client = ChatOpenAI(
-                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview", streaming=True, callbacks=[self.__callback])
+                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview")
         elif llm == "cohere":
             self.__client = Cohere()
 
@@ -131,6 +130,11 @@ class Chat():
 
         docs = [Document(page_content=doc[2], metadata={
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
+        
+        callback = AsyncIteratorCallbackHandler()
+        self.__client = ChatOpenAI(
+                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview", streaming=True, callbacks=[callback])
+        
         chain = load_qa_chain(self.__client, chain_type="stuff", verbose=True)
 
         # Signal the aiter to stop. 
@@ -145,12 +149,14 @@ class Chat():
         task = asyncio.create_task(
             wrap_done(
                 chain.ainvoke(input={"input_documents":docs, "question":query}),
-                self.__callback.done
+                callback.done
             )
         )
 
-        async for token in self.__callback.aiter():
+        async for token in callback.aiter():
+            print(f"data: {token}")
             yield f"data: {token}\n\n"
+
         await task     
 
 
