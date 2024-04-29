@@ -1,11 +1,9 @@
 from RAG.flows import FlowType
 from RAG.chat import Chat
 from pydantic import BaseModel
-import json
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-
 import torch
 import shutil
 from torchvision.io import read_image
@@ -93,7 +91,7 @@ async def upload_file(file: UploadFile = File(...)):
                  "image/bmp": ".bmp", "image/gif": ".gif"}
     file_location = os.path.join(os.path.dirname(
         __file__), "../assets/", "1" + image_map[file.content_type])
-    print(file_location, "file_location")
+    ##print(file_location, "file_location")
     with open(file_location, "wb+") as file_object:
         file_object.write(contents)
     return {"info": f"file '{file.filename}' saved at '{file_location}'"}
@@ -173,10 +171,8 @@ async def rag_query_steam(query: Query):
     if query.model not in models:
         return {"error": "model not found."}
 
-    model = models[query.model]
-
+    model = models['openai']
     return StreamingResponse(model.stream_query(text), media_type="text/event-stream")
-
 
 class FlowQuery(BaseModel):
     flow: str
@@ -236,7 +232,7 @@ async def rag_flow(flow_query: MultiFlowQuery):
     model = models[flow_query.model]
 
     coroutine = generate_flows(flow_query.injury, flow_query.injury_location, flows, model)
-    print(coroutine)
+    #print(coroutine)
 
     return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "responses": coroutine}
 

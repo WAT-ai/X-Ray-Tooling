@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import {
   Typography,
   Button,
@@ -89,35 +90,60 @@ const ChatScreen = () => {
   }, [isSaved]);
 
 
-  //branch test
   const sendQuery = async () => {
     if (input.trim() !== "") {
       const newMessage = { text: input, sender: "user" };
       setMessages((messages) => [...messages, newMessage]);
       setInput("");
 
-      try {
-        const response = await fetch("http://127.0.0.1:8000/rag/query", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ text: input.trim(), model: model }),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          console.log("RAG run:", data);
-          setData(data);
-          const serverMessage = { text: data.response[0], sender: "bot" };
-          setChatDocs(data.response[1].map((doc) => doc.page_content));
-          setMessages((messages) => [...messages, serverMessage]); // Add new server message to the conversation
-          console.log(messages);
+
+      const ctrl = new AbortController();
+
+        try {
+            await fetchEventSource('http://127.0.0.1:8000/rag/query/stream', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Accept: 'text/event-stream'
+                },
+                signal: ctrl.signal,
+                openWhenHidden: true,
+                body: JSON.stringify({
+                    text: input.trim(),
+                    model: model,
+                }),
+                onopen: async (res) => {
+                    const contentType = res.headers.get('content-type');
+
+                    if (!!contentType && contentType.indexOf('application/json') >= 0) {
+                        throw await res.json();
+                    }
+                },
+                onerror: (e) => {
+                    if (!!e) {
+                        console.log('Fetch onerror', e);
+                        // do something with this error
+                    }
+                    throw e;
+                },
+                onmessage: async (ev) => {
+                    const data = ev.data;
+                    if (!data) {
+                        return;
+                    }
+                    try {
+                        const d = data;
+                        console.log(d)
+                    } catch (e) {
+                        console.log('Fetch onmessage error', e);
+                    }
+                },
+            })
+        } catch (e) {
+            console.log('Error', e);
         }
-      } catch (error) {
-        console.error("Error running RAG:", error);
-      }
-    }
   };
+}
 
   const handleSave = (event) => {
     setFlowDocs({ base: [], restriction: [], heat_ice: [], expectation: [] });
@@ -198,50 +224,50 @@ const ChatScreen = () => {
 
 
 
-const sendFlows = async (flows) => {
-  if (injury.trim() == '' || injuryLocation.trim() == '') return;
+  const sendFlows = async (flows) => {
+    if (injury.trim() == '' || injuryLocation.trim() == '') return;
 
-  try {
-    // set loading
-    setFlowMessage("Loading...");
-    const response = await fetch('http://127.0.0.1:8000/rag/flow/async', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ injury: injury, injury_location: injuryLocation, flows: flows, model: model }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log('RAG run:', data);
-      setData(data);
+    try {
+      // set loading
+      setFlowMessage("Loading...");
+      const response = await fetch('http://127.0.0.1:8000/rag/flow/async', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ injury: injury, injury_location: injuryLocation, flows: flows, model: model }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log('RAG run:', data);
+        setData(data);
+        
+        console.log(data.responses.length);
+        var fData = {};
+        var fDocs = {};
+
+
       
-      console.log(data.responses.length);
-      var fData = {};
-      var fDocs = {};
+        for (let i = 0; i < data.responses.length; i++){
+          fData[data.responses[i][0]] = data.responses[i][1][0].content;
+          fDocs[data.responses[i][0]] = data.responses[i][1][1].map((doc) => doc.page_content);
 
+        }
+        
 
-    
-      for (let i = 0; i < data.responses.length; i++){
-        fData[data.responses[i][0]] = data.responses[i][1][0].content;
-        fDocs[data.responses[i][0]] = data.responses[i][1][1].map((doc) => doc.page_content);
+        setFlowData(fData);
+        setFlowDocs(fDocs);
+
+        console.log("FData: ",fData);
+        console.log("FDocs: ",fDocs);
+
 
       }
-      
-
-      setFlowData(fData);
-      setFlowDocs(fDocs);
-
-      console.log("FData: ",fData);
-      console.log("FDocs: ",fDocs);
-
-
+    } catch (error) {
+      console.error('Error running RAG:', error);
     }
-  } catch (error) {
-    console.error('Error running RAG:', error);
-  }
-  
-};
+    
+  };
 
 
   const renderFlowDocs = (flowDocs) => {
@@ -608,4 +634,5 @@ const sendFlows = async (flows) => {
     </div>
   );
 };
+
 export default ChatScreen;

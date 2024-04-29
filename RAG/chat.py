@@ -1,9 +1,11 @@
 from cohere import Client
 import os
 from langchain_openai import ChatOpenAI
+from langchain.callbacks import AsyncIteratorCallbackHandler
+from langchain_core.output_parsers import StrOutputParser
 from langchain_community.llms import Cohere
 from langchain.chains.question_answering import load_qa_chain
-from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+from langchain_core.runnables import RunnableLambda
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.docstore.document import Document
 import uuid
@@ -15,6 +17,8 @@ from abc import ABC, abstractmethod
 from RAG.flows import FlowType, Flow
 import langchain
 from operator import itemgetter
+import asyncio
+
 
 
 # For Testing Purposes...
@@ -36,10 +40,10 @@ class Chain:
                 "documents") | RunnableLambda(cls.format_documents)}
             | prompt
             | llm_client
+            | StrOutputParser()
         )
         return chain
-
-
+    
 class Chat():
     """
     A class that integrates with the Cohere API for conversational AI purposes.
@@ -63,13 +67,13 @@ class Chat():
             num_matches (int): Number of matching documents to return upon a query.
             dataset_path (str [Path]): Path to the dataset directory.
         """
-
+        self.__callback = AsyncIteratorCallbackHandler()
         dotenv.load_dotenv()
         self.__key = os.getenv(f'{llm.upper()}_API_KEY')
 
         if llm == "openai":
             self.__client = ChatOpenAI(
-                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview")
+                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview", streaming=True, callbacks=[self.__callback])
         elif llm == "cohere":
             self.__client = Cohere()
 
@@ -109,8 +113,10 @@ class Chat():
         chain = load_qa_chain(self.__client, chain_type="stuff")
         out = chain.run(input_documents=docs, question=query)
         return [out, docs]
-
-    def stream_query(self, query):
+    
+    
+    
+    async def stream_query(self, query):
         """
         Stream a query using OpenAI's language model.
 
@@ -118,19 +124,35 @@ class Chat():
             query (str): The query string.
 
         Returns:
-            str: The response from the language model.
+            AsyncGenerator: Each token yielded for streamingResponse
         """
+
         rag_docs = self.__embedding.get_similar_documents(query)
 
         docs = [Document(page_content=doc[2], metadata={
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
-        chain = load_qa_chain(self.__client, chain_type="stuff")
-        response = chain.stream(
-            {"input_documents": docs, "question": query}, return_only_outputs=True)
+        chain = load_qa_chain(self.__client, chain_type="stuff", verbose=True)
 
-        for chunk in response:
-            current_content = chunk
-            yield current_content["output_text"]
+        # Signal the aiter to stop. 
+        async def wrap_done(fn, event):
+            try:
+                await fn
+            except Exception as e:
+                print(f"Caught exception: {e}")
+            finally:
+                event.set()
+
+        task = asyncio.create_task(
+            wrap_done(
+                chain.ainvoke(input={"input_documents":docs, "question":query}),
+                self.__callback.done
+            )
+        )
+
+        async for token in self.__callback.aiter():
+            yield f"data: {token}\n\n"
+        await task     
+
 
     def flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
         """
@@ -148,7 +170,7 @@ class Chat():
         docs = [Document(page_content=doc[2], metadata={
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
 
-        print(f"Templated Query: {flow_query}")
+        ##print(f"Templated Query: {flow_query}")
 
         out = self.__chain.invoke({"template": flow_query, "documents": docs})
         return [out, docs]
@@ -169,7 +191,7 @@ class Chat():
         docs = [Document(page_content=doc[2], metadata={
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
 
-        print(f"Templated Query: {flow_query}")
+        ##print(f"Templated Query: {flow_query}")
 
         out = self.__chain.stream({"template": flow_query, "documents": docs})
 
@@ -210,19 +232,19 @@ if __name__ == "__main__":
     injury = "Fracture"
     injury_location = "Ankle, Tibia Bone"
 
-    print("Testing each Flow...")
+    ##print("Testing each Flow...")
     response = chat.flow_query(injury, injury_location, FlowType.BASE)
 
-    print(f"\nResponse: {response}")
+    ##print(f"\nResponse: {response}")
     while True:
         # Get the user message
         message = input("User: ")
 
         # Typing "quit" or "q" ends the conversation
         if message.lower() == "quit" or message.lower() == "q":
-            print("Ending chat.")
+            ##print("Ending chat.")
             break
         else:
-            response = chat.query(message)
+            response = chat.stream_query(message)
             print(response)
             print(type(response))
