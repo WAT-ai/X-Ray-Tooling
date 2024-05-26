@@ -1,8 +1,8 @@
-PWD /Users/alialh/Documents/Programming/WatAI/X-Ray-Tooling/report_documents
+PWD /Users/hargunmujral/Desktop/Repos/X-Ray-Tooling/report_documents
 INPUT /usr/local/texlive/2023/texmf.cnf
 INPUT /usr/local/texlive/2023/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/alialh/Documents/Programming/WatAI/X-Ray-Tooling/report_documents/CUCAI_paper.tex
+INPUT /Users/hargunmujral/Desktop/Repos/X-Ray-Tooling/report_documents/CUCAI_paper.tex
 OUTPUT CUCAI_paper.log
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/ieeetran/IEEEtran.cls
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/ieeetran/IEEEtran.cls
@@ -675,8 +675,6 @@ INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam1
 INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam7.tfm
 INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
-INPUT /usr/local/texlive/2023/texmf-dist/fonts/vf/adobe/times/ptmb7t.vf
-INPUT /usr/local/texlive/2023/texmf-dist/fonts/tfm/adobe/times/ptmb8r.tfm
 INPUT ./RAG_flow.png
 INPUT ./RAG_flow.png
 INPUT RAG_flow.png

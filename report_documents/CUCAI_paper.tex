@@ -1,4 +1,4 @@
- % ==================================
+% ==================================
 % DO NOT EDIT
 % ==================================
 \documentclass[conference]{IEEEtran}
@@ -92,6 +92,14 @@
     \href{mailto:mshatil@uwaterloo.ca}{mshatil@uwaterloo.ca}
 }
 
+\and
+
+\IEEEauthorblockN{Jeevan Parmar}
+\IEEEauthorblockA{
+    \textit{University of Waterloo} \\
+    \href{mailto:jeevan.parmar@uwaterloo.ca}{jeevan.parmar@uwaterloo.ca}
+}
+
 
 % Uncomment below to add more authors
 
@@ -128,20 +136,15 @@ This paper introduces a novel diagnostic tool that combines Supervised Learning 
 
 \section{Introduction}
 
-There is an urgent necessity to advance the quality and speed of X-ray diagnosis. As it currently stands, there is an average delay of 14-days\cite{VCH} between performing an X-ray scan and an appointment with a specialist to discuss results. This gap not only hinders the diagnostic process but also leaves patients in a state of uncertainty and anxiety while awaiting further consultation with healthcare specialists. And considering that up to 25\% of X-rays are rejected or must be repeated \cite{BMC2017}, this issue is exacerbated. Thus we hope to tackle the  problem of the absence of immediate rehabilitative guidance for patients throughout prevalent X-ray procedures. 
+There is an urgent necessity to advance the quality and speed of X-ray diagnosis. As it currently stands, there is an average delay of 14-days\cite{VCH} between performing an X-ray scan and an appointment with a specialist to discuss results. This gap not only hinders the diagnostic process but also leaves patients in a state of uncertainty and anxiety while awaiting further consultation with healthcare specialists. Considering that up to 25\% of X-rays are rejected or must be repeated \cite{BMC2017}, this issue is exacerbated. Thus, we hope to tackle the problem of the absence of immediate rehabilitative guidance for patients throughout prevalent X-ray procedures. 
 
 \subsection{Motivation}
 
-
 Conventional methods of interpreting X-ray images are often hampered by speed and variability of human analysis, which can yield inconsistent diagnostic outcomes \cite{Kuo2022AI}. By employing Supervised Learning and Retrieval-Augmented Generation (RAG), we strive for diagnostic precision and consistency surpassing traditional human-led evaluations.
 
-Our aspirations, however, extend beyond diagnostics. Leveraging AI to scrutinize X-ray data, we aim to offer patients personalized rehabilitation plans and provide immediate, informed responses to their queries. This approach is designed to kickstart recovery ahead of specialist consultations, providing vital, timely advice when it is most needed \cite{Sharma2023}.
+Our aspirations, however, extend beyond diagnostics. Leveraging AI to scrutinize X-ray data, we aim to offer patients personalized rehabilitation plans and provide immediate, informed responses to their queries. This approach is designed to kickstart recovery ahead of specialist consultations, providing vital and timely advice when it is most needed \cite{Sharma2023}.
 
-The fundamental objective is to elevate patient outcomes through rapid, precise diagnostics and early intervention strategies. Through this project, we underscore our commitment to the application of state-of-the-art AI technologies within the healthcare field, contributing to diagnosis and facilitating a seamless recovery journey. 
-
-
-
-
+The fundamental objective is to elevate patient outcomes through rapid, precise diagnostics and early intervention strategies. Through this project, we underscore our commitment to the application of state-of-the-art AI technologies within the healthcare field, contributing to diagnosis and facilitating a seamless recovery journey for our users. 
 
 
 % Our project addresses the critical need for enhancing medical diagnostics and patient support using AI technologies, including Computer Vision and Retrieval-Augmented Generation (RAG). Traditional X-ray analysis methods, limited by speed and variability in human judgment, often lead to inconsistent diagnoses \cite{Kuo2022AI}.  By employing AI, we aim for consistent, accurate evaluations that exceed human analysis capabilities.
@@ -155,31 +158,29 @@ The fundamental objective is to elevate patient outcomes through rapid, precise 
 
 Multiple studies have highlighted the efficacy of artificial intelligence in the realm of radiography-based fracture detection. A comprehensive review by a team of researchers in England, encompassing 42 studies, revealed comparable diagnostic performance between AI and clinicians, with both exhibiting a sensitivity of 91-92\% \cite{Kuo2022AI}. Notably, the BoneView model released by startup Gleamer in France, demonstrated proficiency to a degree higher than musculoskeletal radiologists in detecting fractures across diverse anatomical regions \cite{BoneView}. Their approach reduced missed fractures by 29\% and enhanced sensitivity by 16\%, illustrating the promise of AI in the field of orthopaedic radiology \cite{Guermazi2022AI}.
 
-Presently, the most common methodology involves training AI models using deep learning networks. A study demonstrated the effectiveness of re-training a pre-existing CNN model, specifically an Inception v3 model, which achieved a binary classification model with 90\% sensitivity and 88\% specificity in fracture detection \cite{KIM2018439}. Additionally, a group of doctors and researchers from Sweden utilized openly available deep learning networks to create AI fracture detectors that performed similarly to senior orthopaedic surgeons when analyzing medical images \cite{Olczak2017AIOrtho}.
+Presently, the most common methodology involves training AI models using deep learning networks. A study demonstrated the effectiveness of re-training a pre-existing CNN model, specifically an Inception v3 model, which achieved a binary classification model with 90\% sensitivity and 88\% specificity in fracture detection \cite{KIM2018439}. Additionally, a group of doctors and researchers from Sweden utilized openly available deep learning networks to create AI fracture detectors that performed similarly to senior orthopaedic surgeons when analyzing medical diagnostic images \cite{Olczak2017AIOrtho}.
 
 Although numerous works have shown the effectiveness of employing pre-trained deep-learning networks for the task of classifying fractures, integrating AI into real-world systems to benefit patients beyond mere fracture detection persists to be an issue. Novel techniques using Large Language Models (LLMs), such as RAG, have proven to reduce hallucination and provide accurate information when summarizing radiology papers, extracting relevant information and returning deterministic data \cite{lewis2021retrievalaugmented}. This approach can provide patients with recent and precise information extending from the training data in the LLM, and when used effectively toward creating rehabilitation plans, can allow for the initiation of treatment without delays \cite{Sharma2023}.
 
-
 \section{Methodology}
+
 \subsection{X-Ray Classification \& Recognition: Approach}
-Our methodology for X-ray image recognition and interpretation would be divided into two phases: binary classification to determine the exstence of a fracture, and the subsequent identification of the fracture's precise location within the X-ray scan. 
+Our methodology for X-ray image recognition and interpretation would be divided into two phases: binary classification to determine the existence of a fracture, and the subsequent identification of the fracture's precise location within the X-ray scan. 
 
 \paragraph{Initial Research and Planning}
-We commenced the project with an in-depth investigation into the prevalent challenges within X-ray dagnostics, followed by strategic planning. For the binary classification task, we selected to experiment between DenseNet and EfficientNet architectures, targeting the detection of fractures with the FracAtlas Dataset. For localization of fractures, we 
+We commenced the project with an in-depth investigation into the prevalent challenges within X-ray diagnostics, followed by strategic planning. For the binary classification task, we selected to experiment between DenseNet and EfficientNet architectures, targeting the detection of fractures with the FracAtlas Dataset. For localization of fractures, we 
 planned to incorporate an object detection model, such as Faster R-CNN.
 % The initial stage involved researching the problems and devising a plan. We opted to use a DenseNet model for binary classification, with the aim of identifying the presence or absence of a fracture using the FracAtlas Dataset. An object detection algorithm, such as Faster R-CNN, was incorporated for detecting the fracture's location.
 
 \paragraph{Revised Approach}
 
-During the exection phase, we encountered hurdles with the quality of our R-CNN model and the practicality of integrating an object-detection approach with our planned workflow. Theses challenges necessitated a revised approach, leading to the decision of building two CNN-based classification models to independently handle each phase: A binary classifier for fractures, and a multiary classificatier for localization. For the latter, this also required searching for a new dataset more comprehensive in body part classification.
+During the execution phase, we encountered hurdles with the quality of our R-CNN model and the practicality of integrating an object-detection approach with our planned workflow. Theses challenges necessitated a revised approach, leading to the decision of building two CNN-based classification models to independently handle each phase: A binary classifier for fractures, and a multiary classifier for localization. For the latter, this also required searching for a new dataset more comprehensive in body part classification.
 % Upon implementation, we faced challenges integrating Faster R-CNN with DenseNet and discovered limitations in the FracAtlas dataset. Consequently, we adjusted our strategy to assign dedicated models for each step and sought a new dataset for more comprehensive body part classification.
 \subsection{Step 1: Presence of a Fracture}
 \subsubsection{Model Information}
 To train our fracture detection model, we utilized the FracAtlas dataset \cite{FracAtlas}, comprising 4,083 annotated X-ray images. Using the DenseNet121 and EfficientNet architectures as backbones, and weights from pre-trained artifacts using the ImageNet dataset, we trained the models to classify X-ray images as either fractured (1) or non-fractured (0). We used a 70:15:15 split for training, testing and validation to ensure the model's generalization.
 
 % We utilized  DenseNet architecture for its efficiency in feature extraction, crucial for the binary classification task at hand. The classification was binary, with labels 1 (fractured) and 0 (not fractured). The dataset was divided into training, validation, and testing sets with a ratio of 70:15:15, ensuring a balanced approach to model training and evaluation.
-
-
 
 \subsubsection{Testing Results}
 We iterated on testing different hyperparameters and configurations to optimize the model's performance. By using Optuna, a hyperparameter optimization framework, we employed the Tree-structured Parzen Estimation algorithm to search for the best hyperparameters. This approach of Bayesian optimization allowed us to fine-tune the model's hyperparameters, including the number of epochs, batch size, optimizer, and learning rate.
@@ -224,8 +225,7 @@ BCE: Binary Cross Entropy Loss.
 \end{flushleft}
 \end{table}
 
-We had inferred from manual inspection of the various trials with different hyperparameter configurations that 3 epochs were sufficient for the model to converge, and
-more epochs did not significantly impact the test accuracy. After fine-tuning the hyperparameters, we achieved a validation accuracy of 86.6\% with the EfficientNet model, a significant improvement over the initial 71.84\% accuracy.
+We had inferred from manual inspection of the various trials with different hyperparameter configurations that 3 epochs were sufficient for the model to converge, and more epochs did not significantly impact the test accuracy. After fine-tuning the hyperparameters, we achieved a validation accuracy of 86.6\% with the EfficientNet model, a significant improvement over the initial 71.84\% accuracy.
 
 Upon experimentation, we saw that, almost universally with the same hyperparameter configurations, EfficientNet outperformed DenseNet in terms of accuracy. Thus, we opted to allocate more resources to testing and tuning the EfficientNet model. 
 
@@ -237,14 +237,13 @@ In this step, we focus on the body part classification of detected fractures bas
 % Our search for appropriate datasets yielded three promising candidates, each with distinct features and potential applications in fracture location classification.
 
 \paragraph{UNIFESP X-Ray Body Part Classification Dataset}
-This dataset consists of 2,481 X-ray images across 22 body parts, annotated in a multilabel format, making it ideal for detailed classification tasks in our second step.
+This dataset consists of 2,481 X-ray images across 22 body parts, annotated in a multi-label format, making it ideal for detailed classification tasks in our second step.
 
 \paragraph{VinDr-BodyPartXR}
 Derived from DICOM scans, it includes general labels such as "abdominal," "pediatric," and "adult." Its broad categorizations, however, lacked the specificity needed for precise classification in our study.
 
 \paragraph{MURA (Musculoskeletal Radiographs)}
 A large collection focusing on upper body parts, including 7 specific areas. While extensive, its scope was too narrow for the broad classification goals of our project.\\
-
 
 We thus selected the UNIFESP dataset for its comprehensive coverage of body parts, which aligned with our classification objectives. 
 
@@ -254,8 +253,8 @@ We built off of a DenseNet architecture, and tailored it's output layer to suppo
 \subsubsection{Data Preprocessing}
 Upon examination, it was discovered that only the published training set of the UNIFESP dataset had labels. Thus, the number of usable images dropped to 1738 images. Additionally, some images in the dataset were labelled with multiple body parts, which were removed to simplify the classification task and remove unnecessary complexity. This resulted in a final dataset of 1606 images.
 
-The data labels, represented as numerical values ranging from 0 to 21 for each body part, and a 80:20 ratio was employed ratio for training and testing respectively. Due to the small size of the dataset, we wanted to include as many images as possible in the training set, and thus did not use a test set.
- We intend on experimenting with data augmentation techniques to artificially increase the size of the dataset in the future.
+The data labels, represented as numerical values ranging from 0 to 21 for each body part. A 80:20 ratio was the employed ratio for training and testing respectively. Due to the small size of the dataset, we wanted to include as many images as possible in the training set, and thus did not use a test set.
+We intend on experimenting with data augmentation techniques to artificially increase the size of the dataset in the future.
 
 \subsubsection{Testing Results}
 In the initial trial, the model was trained with configurations summarized in Table~\ref{tab:model_performance}. 
@@ -292,9 +291,11 @@ In general, regarding our specific task, the batch size seemed the least relevan
 
 Further investigation showed that a learning rate of 0.01 would adversely affect the highest accuracy model, and Adam remains the ideal optimizer for this task.
 
-\subsubsection{Exploratory Advances in Fracture Detection - Employing Faster R-CNN}
+\subsection{Exploratory research with Faster R-CNN}
 
-This research employs a Faster R-CNN model with a ResNet50 backbone, renowned for its object detection prowess, to pinpoint fractures in medical imaging data from the FracAtlas dataset. The methodology integrates data pre-processing, such as image resizing and normalization, and leverages transfer learning to utilize pre-trained weights, enhancing the model’s capability to detect fractures accurately \cite{Ren2015FasterRT}. Hyperparameter optimization is performed using Optuna, focusing on learning rate, weight decay, and the number of epochs to refine model performance. The training process involves batch processing, forward and backward passes, and loss computation, with the Stochastic Gradient Descent (SGD) optimizer chosen for its effectiveness in deep learning model training. The model is periodically evaluated on a validation set to monitor performance and adjust hyperparameters accordingly \cite{TorchvisionFasterRCNN}.
+For the second phase, fracture localization, we also conducted research into an alternative approach using Faster R-CNN. The purpose of this experimentation was to solidify whether a computer vision approach would be more effective than a multiary classification model for fracture localization.
+
+Leveraging a ResNet50 backbone, we pinpoint fractures in medical imaging data, again from the FracAtlas dataset. We use data pre-processing techniques such as image resizing and normalization, and leverages transfer learning to utilize pre-trained weights, enhancing the model’s capability to detect fractures accurately \cite{Ren2015FasterRT}. Hyperparameter optimization is performed using Optuna, focusing on learning rate, weight decay, and the number of epochs to refine model performance. The training process involves batch processing, forward and backward passes, and loss computation, with the Stochastic Gradient Descent (SGD) optimizer chosen for its effectiveness in deep learning model training \cite{TorchvisionFasterRCNN}.
 
 \begin{table}[H]
 \centering
@@ -302,7 +303,7 @@ This research employs a Faster R-CNN model with a ResNet50 backbone, renowned fo
 \label{tab:model_hyperparameters}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-\textbf{S.No} & \textbf{Mean IOU} & \textbf{Lr} & \textbf{Weight\_decay} & \textbf{No of epochs} \\ \hline
+\textbf{Trial} & \textbf{Mean IOU} & \textbf{Lr} & \textbf{Weight decay} & \textbf{Epochs} \\ \hline
 1 & 0.2032 & 0.00082 & 0.00011 & 6 \\ \hline
 2 & 0.2270 & 0.00095 & 0.00011 & 5 \\ \hline
 3 & 0.2177 & 0.00091 & 0.00010 & 5 \\ \hline
@@ -310,13 +311,16 @@ This research employs a Faster R-CNN model with a ResNet50 backbone, renowned fo
 5 & 0.2470 & 0.00098 & 0.00022 & 5 \\ \hline
 6 & 0.2175 & 0.00032 & 0.00037 & 6 \\ \hline
 \end{tabular}
+\footnotesize
 \end{table}
 
 
-The table ~\ref{tab:model_hyperparameters} lists the outcomes of multiple runs with varying hyper parameters. The `Mean\_IOU` column represents the mean Intersection over Union, a common metric for evaluating the accuracy of an object detector on a particular dataset. The `Lr` column indicates the learning rate, `Weight\_decay` is a regularization term to prevent over fitting, and `No of epochs` shows how many complete passes the algorithm has made over the entire training dataset.
+Table ~\ref{tab:model_hyperparameters} lists the outcomes of multiple runs with varying hyper parameters. Mean IOU represents the mean Intersection over Union, an object detection performance metric. Lr represents the learning rate, and weight decay is a regularization technique to prevent overfitting.
 
-\textbf{Results:} The dataset records indicate that the model performed best with a mean IOU of approximately 0.2471 when the learning rate was set to roughly 0.000988, paired with a weight decay of about 0.000225 over the course of 5 epochs. Notably, this configuration achieved the highest recorded mean IOU without the need for the most extended training period, indicating a more efficient learning process compared to other configurations. In contrast, the lowest mean IOU observed was approximately 0.2033 with a significantly lower learning rate of 0.000442 and a higher weight decay of 0.000420 across 5 epochs. This outcome could suggest that either the learning rate was too low for the model to make significant updates to its weights or the high weight decay overly penalized the model parameters, hindering its ability to fit the data effectively.
-In general, for our specific task, the batch size was least relevant, as successful models were achieved with varying batch sizes. Optimizers SGD and Adam both performed well, alongside effective learning rates of 0.001 and 0.0001 and weight decays of 0.001 and 0.1.
+\textit{Results:~} The dataset records indicate that the model performed best with a mean IOU of approximately 0.2471 when the learning rate was set to roughly 0.000988, paired with a weight decay of about 0.000225 over the course of 5 epochs. Notably, this configuration achieved the highest recorded mean IOU without the need for the most extended training period, indicating a more efficient learning process compared to other configurations. 
+% In general, for our specific task, the batch size was least relevant, as successful models were achieved with varying batch sizes. Optimizers SGD and Adam both performed well, alongside effective learning rates of 0.001 and 0.0001 and weight decays of 0.001 and 0.1.
+
+What this tells us with regards to overall performance of the Faster R-CNN approach is that the model is capable of detecting fractures with a mean IOU of 0.2471, which is a promising result. However, the model's performance is highly sensitive to the learning rate and weight decay, and thus, further experimentation is required to optimize the model's performance.
 
 \subsection{Patient Diagnosis: RAG}
 To generate an accurate diagnosis for the provided X-ray, we built a customized Retrieval Augmented Generation (RAG) pipeline. This pipeline retreives document chunks sourced from the PubMed database of clinically verified medical documents, using their querying tool to find papers and journals related to X-ray imaging and rehabilitation. 
@@ -344,25 +348,23 @@ The RAG pipeline was designed as follows:
 
 % Upon classification of the user’s X-Ray image and embedding of the fracture location and other patient information, this data is used to query a vector database. Relevant documents are then retrieved to provide context for the GPT-4 LLM, which generates the diagnosis response.
 % \subsubsection
-\subsubsection{First Stage: Identifying Databases}
+\subsubsection{Identifying Databases}
 
 To populate our internal database of medical documents, Pubmed and Springer were used due to their quality, size, and ease-of-use (accesible APIs and parseable formats).
 
-\subsubsection{Second Stage: Document Chunking}
+\subsubsection{Document Chunking}
 
-To split the documents into smaller "chunks", it was decided to use a standard 100 character chunk splitter. By using a 100 character chunk size, we found that the chunks contained adequate context, and the fixed size allows for higher-quality embeddings, and thus improved results.
+To split the documents into smaller ``chunks", we decided on a 500 character chunk splitter. By using a 500 character chunk size, we found that the chunks contained adequate context, and the fixed size allows for higher-quality embeddings, and thus improved results.
 
-\subsubsection{Third Stage: Embedding}
+\subsubsection{Embedding}
 
 The chunked documents were then embedded, using either HuggingFace or higher-dimensional OpenAI embeddings via Langchain, and stored with metadata in a Chroma database.
 
-\subsubsection{Fourth Stage: RAG Flow}
+\subsubsection{RAG Flow}
 
-In use, a user's query is vectorized and matched against the document chunks in Chroma. The top five relevant pieces form the basis of the LLM response—enriched by both Cohere and GPT-4 models—providing an informed reply grounded in the specific facts from the documents. The user receives this alongside source citations, ensuring transparency and veracity.
+In use, a user's query is vectorized and matched against the document chunks in Chroma. The top five relevant pieces form the basis of the LLM response—enriched by both Cohere and GPT-4 models—providing an informed reply grounded in the specific facts from the documents. The user receives this alongside source citations, ensuring transparency and veracity. For a visual representation of this flow see Figure~\ref{fig:image1}.
 
-For a visual representation of this flow see Fig. 1. RAG Pipeline.
-
-\subsubsection{Fifth Stage: User Flows}
+\subsubsection{User Flows}
 
 To provide the user with a detailed diagnosis and treatment plan, various pre-defined "User Flows" have been designed. These flows are specially-designed prompt templates that utilise the Langchain API, to ensure the user receives all the fundamental information they need about their injury. As it stands, 4 user flows have been defined:
 
@@ -403,7 +405,7 @@ A link to the GitHub repository can be found here: \href{https://github.com/WAT-
 
 
 \section{Conclusion}
-The waiting period that exists between having diagnostic imaging taken and consultation with a doctor can be bridged, providing better patient care, speeding up recovery and reducing the period of uncertainty that follows injuries. The utilization of Supervised Learning and Retrieval Augmented Generation to create a diagnostic tool that improves accuracy and efficiency of X-ray fracture diagnosis can be achieved, as shown in the preceeding sections. We attempted employing a Faster RCNN model with a ResNet50 backbone, which resulted in low accuracy, making it impractical for application during  the current stage of the product. However, we achieved high functional accuracies utilizing CNN's trained on an extensive dataset while leveraging DenseNet and EfficientNet models. Overfitting issues were identified within the X-Ray localization model, which will be improved in future iterations. Quick, accurate and medically relevant information was successfully delivered to users, through the usage of a RAG pipeline that retrieved relevant data from a PubMed document database. Impactful outcomes for reduction of waiting times for consultations regarding results and follow-up procedures are clearly observed. 
+The waiting period that exists between having diagnostic imaging taken and consultation with a doctor can be bridged, providing better patient care, speeding up recovery and reducing the period of uncertainty that follows injuries. The utilization of Supervised Learning and Retrieval Augmented Generation to create a diagnostic tool that improves accuracy and efficiency of X-ray fracture diagnosis can be achieved, as shown in the preceeding sections. We attempted employing a Faster RCNN model with a ResNet50 backbone, which resulted in low accuracy, making it impractical for application during  the current stage of the product. However, we achieved high functional accuracies utilizing CNN's trained on an extensive dataset while leveraging DenseNet and EfficientNet models. Overfitting issues were identified within the X-ray localization model, which will be improved in future iterations. Quick, accurate and medically relevant information was successfully delivered to users, through the usage of a RAG pipeline that retrieved relevant data from a PubMed document database. Impactful outcomes for reduction of waiting times for consultations regarding results and follow-up procedures are clearly observed. 
 
 \subsection{Results}
 Our results demonstrate that our initial goal of producing a pipeline capable of diagnosing a fracture given an X-ray was successful. For Step 1 \& 2 (identifying the presence of a fracture and classifying a fracture's location), the DenseNet and EfficientNet models demonstrated high-quality results: following training and hyperparameter tuning, the models were able to achieve an accuracy of 86.60\% and 91.30\% respectively on an unseen 'test' dataset. 
