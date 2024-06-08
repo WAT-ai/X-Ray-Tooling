@@ -173,7 +173,9 @@ class ChromaEmbedding(Embedding):
         for doc in docs:
             parsed_docs.append(
                 (0.0, doc.metadata['seq_num'], doc.page_content))
+        print(parsed_docs)
         return parsed_docs
+        
 
     def reupload_to_chroma(self) -> None:
         """

@@ -1,5 +1,6 @@
 from RAG.flows import FlowType
-from RAG.chat import Chat
+from RAG.chat import Chat 
+#if getting a RAG module not found run: export PYTHONPATH="${PYTHONPATH}:path/to/xray-tooling-directory"
 from pydantic import BaseModel
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -87,6 +88,7 @@ phase2_model.eval()
 async def upload_file(file: UploadFile = File(...)):
     global file_location
     contents = await file.read()
+    print(contents)
     image_map = {"image/jpeg": ".jpg", "image/png": ".png",
                  "image/bmp": ".bmp", "image/gif": ".gif"}
     file_location = os.path.join(os.path.dirname(
@@ -200,7 +202,6 @@ class MultiFlowQuery(BaseModel):
     injury_location: str
     model: str
 
-import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent.futures
 
