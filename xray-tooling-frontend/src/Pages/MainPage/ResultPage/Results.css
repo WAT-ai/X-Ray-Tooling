@@ -1,46 +1,10 @@
-.upload-page{
+.results-page{
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.upload-parent {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.file-upload-container {
-    display: flex;
-    flex-direction: column;
-    height: 50vh;
-    width: 60vw;
-}
-
-.label-description {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    height: 4vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
-
-.file-upload {
-    height: 40vh;
-    width: 60vw;
-}
-
-.file-card{
-    height: 40vh;
-    width: 60vw
-}
-
-.upload-title-container {
+.results-title-container {
     width: 80%;
     display: flex;
     justify-content: flex-start;
@@ -48,8 +12,48 @@
     height: 100%;
 }
 
+.results-parent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 80%;
+}
 
-.upload-submit {
+.results-content-container {
+    display: flex;
+    height: 55vh;
+    width: 100%;
+}
+
+.box-frame-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 0 0 60%;
+    margin-right: 10px;
+}
+
+.results-image{
+    flex: 0 0 40%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.box-frame-1{
+    border: 2px solid black;
+    height: 50%;
+    margin-bottom: 5px;
+}
+
+.box-frame-2{
+    border: 2px solid black;
+    height: 50%;
+    margin-top: 5px;
+}
+
+.results-submit {
+    margin-top: 20px;
     align-items: center;
     background-color: #fff;
     border-radius: 12px;
@@ -75,7 +79,10 @@
     touch-action: manipulation;
 }
 
-.upload-submit:hover {
+.results-submit:hover {
     box-shadow: #121212 0 0 0 3px, transparent 0 0 0 0;
 }
+
+
+
 

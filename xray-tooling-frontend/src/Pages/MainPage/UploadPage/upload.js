@@ -5,6 +5,7 @@ import NavBar from '../../../Components/NavBar';
 import ProgressBar from '../../../Components/ProgressBar';
 import { useMyContext } from '../../../context';
 import './upload.css';
+import { Typography } from '@mui/material';
 
 const UploadPage = ({setStage, image, setImage}) => {
 
@@ -57,57 +58,47 @@ const UploadPage = ({setStage, image, setImage}) => {
     
     return (
         <div className="upload-page">
-            <div className="title-container">
+            <div className="upload-title-container">
                 <h1>1. Upload</h1>
             </div>
-            <FileUploader
-                className="file-upload"
-                label="Upload File"
-                description="You can upload 1 file. File can be up to 50 MB."
-                maxSizeInBytes={50 * 1024 ** 2}
-                maxFiles={1}
-                onChange={(e) => handleChange(e)}
-                onRejected={handleRejected}
-                renderFile={(file) => {
-                    const { name, size, type } = file
-                    const { message } = fileRejection || {}
-                    return (
-                        <FileCard
-                            key={name}
-                            isInvalid={fileRejection != null}
-                            name={name}
-                            onRemove={handleRemove}
-                            sizeInBytes={size}
-                            type={type}
-                            validationMessage={message}
-                        />
-                    )
-                }}
-                values={image}
-            />
-            <button className="submit" onClick={handleSubmit}>Submit</button>
+            <div className="upload-parent">
+                <div className="file-upload-container">
+                    <div className="label-description">
+                        <Typography variant="body">Upload File</Typography>
+                        <Typography variant="subtitle2">You can upload 1 file. File can be up to 50 MB.</Typography>
+                    </div>
+                    <FileUploader
+                        className="file-upload"
+                        maxSizeInBytes={50 * 1024 ** 2}
+                        maxFiles={1}
+                        onChange={(e) => handleChange(e)}
+                        onRejected={handleRejected}
+                        renderFile={(file) => {
+                            const { name, size, type } = file
+                            const { message } = fileRejection || {}
+                            return (
+                                <FileCard
+                                    className="file-card"
+                                    key={name}
+                                    isInvalid={fileRejection != null}
+                                    name={name}
+                                    onRemove={handleRemove}
+                                    sizeInBytes={size}
+                                    type={type}
+                                    validationMessage={message}
+                                />
+                            )
+                        }}
+                        values={image}
+                    />
+                </div>
+                <button className="upload-submit" onClick={handleSubmit}>Submit</button>
+            </div>
         </div>
     );
 
     
 
-/*
-    return (
-        <div>
-            <h1 style={{ color: "black" }}>Upload Page</h1>
-            <div className="parent">
-                <div className="file-upload">
-                    <img src={image} alt="upload" />
-                    <h3> {fileName || "Click box to upload"}</h3>
-                    <p>Maximun file size 10mb</p>
-                    <input type="file" onChange={handleFileChange} />
-                    {image && <button onClick={handleRemove}>Remove File</button>}
-                </div>
-            </div>
-            <button onClick={handleSubmit}>Submit</button>
-        </div>
-    );
-    */
 }
 
 export default UploadPage;
