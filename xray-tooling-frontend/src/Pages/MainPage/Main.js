@@ -29,7 +29,7 @@ const Main = () => {
                         nodeRef.current.addEventListener("transitionend", done, false);
                       }}
                 >
-                    <div ref={nodeRef}>
+                    <div ref={nodeRef} class="h-full">
                         {stage === 'upload' && <UploadPage setStage={setStage} image={image} setImage={setImage} />}
                         {stage === 'results' && <ResultPage setStage={setStage} image={image} />}
                         {stage === 'consultation' && <ConsultationPage setStage={setStage} image={image} />}
@@ -43,9 +43,7 @@ const Main = () => {
         <div style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
             <NavBar />
             <ProgressBar stage={stage} />
-            <div style={{ flexGrow: 1 }}>
-                <RenderStage />
-            </div>
+            <RenderStage />
         </div>
     );
 };
