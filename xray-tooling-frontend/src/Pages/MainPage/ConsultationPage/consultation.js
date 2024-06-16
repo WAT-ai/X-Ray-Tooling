@@ -28,18 +28,21 @@ const ConsultationPage = ({ setStage, setRequest, phaseOneResult, phaseTwoResult
                 <h1 class="text-3xl font-bold">3. Consultation</h1>
             </div>
             <div class="flex-grow flex flex-col items-start pt-4 px-4 w-4/6 mx-auto">
-                <h5>Choose 1 of the following consultation plans</h5>
+                <h5 class="text-gray-500">Choose 1 of the following consultation plans</h5>
                 <Grid container spacing={2} className="h-4/6">
                     <Grid item xs={6}>
                         <Card className="h-full">
-                            <CardActionArea>
+                            <CardActionArea className='h-full'>
                                 <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'base' })}>
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        Base
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Great for general diagnosis on the injury
-                                    </Typography>
+                                    <div class="flex">
+                                        <div class="w-1/6 h-full flex items-center justify-center">
+                                            <MonitorHeartIcon />
+                                        </div>
+                                        <div class="w-5/6 flex flex-col justify-center text-left">
+                                            <p class="text-xl font-bold">Base</p>
+                                            <p class="text-md text-gray-600">Great for general diagnosis on the injury</p>
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </CardActionArea>
                         </Card>
@@ -48,12 +51,15 @@ const ConsultationPage = ({ setStage, setRequest, phaseOneResult, phaseTwoResult
                         <Card className="h-full">
                             <CardActionArea>
                                 <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'heat_ice' })}>
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        Heat And Ice
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Outlines best practices for heating and icing
-                                    </Typography>
+                                    <div class="flex">
+                                        <div class="w-1/6 h-full flex items-center justify-center">
+                                            <MonitorHeartIcon />
+                                        </div>
+                                        <div class="w-5/6 flex flex-col justify-center text-left">
+                                            <p class="text-xl font-bold">Heat And Ice</p>
+                                            <p class="text-md text-gray-600">Outlines best practices for heating and icing</p>
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </CardActionArea>
                         </Card>
@@ -62,12 +68,15 @@ const ConsultationPage = ({ setStage, setRequest, phaseOneResult, phaseTwoResult
                         <Card className="h-full">
                             <CardActionArea>
                                 <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'restriction' })}>
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        Restriction
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        What to avoid with your injury
-                                    </Typography>
+                                    <div class="flex">
+                                        <div class="w-1/6 h-full flex items-center justify-center">
+                                            <MonitorHeartIcon />
+                                        </div>
+                                        <div class="w-5/6 flex flex-col justify-center text-left">
+                                            <p class="text-xl font-bold">Restriction</p>
+                                            <p class="text-md text-gray-600">What to avoid with your injury</p>
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </CardActionArea>
                         </Card>
@@ -76,12 +85,15 @@ const ConsultationPage = ({ setStage, setRequest, phaseOneResult, phaseTwoResult
                         <Card className="h-full">
                             <CardActionArea>
                                 <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'expectation' })}>
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        Expectation
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Recovery time and surgery expectations
-                                    </Typography>
+                                    <div class="flex">
+                                        <div class="w-1/6 h-full flex items-center justify-center">
+                                            <MonitorHeartIcon />
+                                        </div>
+                                        <div class="w-5/6 flex flex-col justify-center text-left">
+                                            <p class="text-xl font-bold">Expectation</p>
+                                            <p class="text-md text-gray-600">Recovery time and surgery expectations</p>
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </CardActionArea>
                         </Card>
