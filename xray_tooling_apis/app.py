@@ -248,6 +248,6 @@ async def rag_flow(flow_query: FlowQuery):
         return {"error": "model not found."}
 
     flow = FlowType(flow_query.flow)
-    model = models[flow_query.model]
+    model = models['openai']
 
     return StreamingResponse(model.stream_flow_query(flow_query.injury, flow_query.injury_location, flow), media_type="text/event-stream")

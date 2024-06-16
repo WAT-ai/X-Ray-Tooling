@@ -36,8 +36,8 @@ const Main = () => {
                     <div ref={nodeRef} class="h-full">
                         {stage === 'upload' && <UploadPage setStage={setStage} image={image} setImage={setImage} />}
                         {stage === 'results' && <ResultPage setStage={setStage} image={image} setPhaseOneResult={setPhaseOneResult} phaseOneResult={phaseOneResult} setPhaseTwoResult={setPhaseTwoResult} phaseTwoResult={phaseTwoResult}/>}
-                        {stage === 'consultation' && <ConsultationPage setStage={setStage} image={image} setRequest={setRequest}/>}
-                        {stage === 'RAG' && <RagPage setStage={setStage} request={request} phaseOneResult={phaseOneResult} phaseTwoResult={phaseTwoResult}/>}
+                        {stage === 'consultation' && <ConsultationPage setStage={setStage} image={image} setRequest={setRequest} phaseOneResult={phaseOneResult} phaseTwoResult={phaseTwoResult}/>}
+                        {stage === 'RAG' && <RagPage setStage={setStage} request={request} injury={phaseOneResult} injuryLocation={phaseTwoResult}/>}
                     </div>
                 </CSSTransition>
             </SwitchTransition>

@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, Typography, Card, CardActionArea, CardContent, TextField } from '@mui/material';
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import './consultation.css'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 
-const ConsultationPage = ({ setStage, setRequest }) => {
+const ConsultationPage = ({ setStage, setRequest, phaseOneResult, phaseTwoResult }) => {
 
     const [message, setMessage] = useState()
-    
-    
 
     const handleSubmit = (requestType) => {
         // Add your logic here for handling the submit event
@@ -23,6 +21,7 @@ const ConsultationPage = ({ setStage, setRequest }) => {
 
     }
 
+
     return (
         <div class="h-full flex flex-col">
             <div class="flex-none flex items-end w-5/6 mx-auto" style={{ height: "10%" }}>
@@ -34,7 +33,7 @@ const ConsultationPage = ({ setStage, setRequest }) => {
                     <Grid item xs={6}>
                         <Card className="h-full">
                             <CardActionArea>
-                                <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'Base' })}>
+                                <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'base' })}>
                                     <Typography gutterBottom variant="h5" component="div">
                                         Base
                                     </Typography>
@@ -48,7 +47,7 @@ const ConsultationPage = ({ setStage, setRequest }) => {
                     <Grid item xs={6}>
                         <Card className="h-full">
                             <CardActionArea>
-                                <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'Restriction' })}>
+                                <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'heat_ice' })}>
                                     <Typography gutterBottom variant="h5" component="div">
                                         Heat And Ice
                                     </Typography>
@@ -62,7 +61,7 @@ const ConsultationPage = ({ setStage, setRequest }) => {
                     <Grid item xs={6}>
                         <Card className="h-full">
                             <CardActionArea>
-                                <CardContent onClick={() => console.log('Clicked!')}>
+                                <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'restriction' })}>
                                     <Typography gutterBottom variant="h5" component="div">
                                         Restriction
                                     </Typography>
@@ -76,7 +75,7 @@ const ConsultationPage = ({ setStage, setRequest }) => {
                     <Grid item xs={6}>
                         <Card className="h-full">
                             <CardActionArea>
-                                <CardContent onClick={() => console.log('Clicked!')}>
+                                <CardContent onClick={() => handleSubmit({ request: 'flow', flow: 'expectation' })}>
                                     <Typography gutterBottom variant="h5" component="div">
                                         Expectation
                                     </Typography>
@@ -108,7 +107,6 @@ const ConsultationPage = ({ setStage, setRequest }) => {
                     </Grid>
                 </Grid>
             </div>
-
         </div>
     );
 };

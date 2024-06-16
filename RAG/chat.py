@@ -72,7 +72,7 @@ class Chat():
 
         if llm == "openai":
             self.__client = ChatOpenAI(
-                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview")
+                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview", streaming=True)
         elif llm == "cohere":
             self.__client = Cohere()
 
@@ -137,7 +137,6 @@ class Chat():
         
         chain = load_qa_chain(self.__client, chain_type="stuff", verbose=True)
 
-        # Signal the aiter to stop. 
         async def wrap_done(fn, event):
             try:
                 await fn
@@ -153,11 +152,19 @@ class Chat():
             )
         )
 
+        buffer = ""
         async for token in callback.aiter():
-            print(f"data: {token}")
-            yield f"data: {token}\n\n"
+            buffer += token
+            if " " in buffer:
+                word, buffer = buffer.rsplit(" ", 1)
+                print(f"data: {word}")
+                yield f"data: {word}\n\n"
 
-        await task     
+        if buffer:
+            print(f"data: {buffer}")
+            yield f"data: {buffer}\n\n"
+
+        await task      
 
 
     def flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
@@ -181,7 +188,7 @@ class Chat():
         out = self.__chain.invoke({"template": flow_query, "documents": docs})
         return [out, docs]
 
-    def stream_flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
+    async def stream_flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
         """
         Processes a query using OpenAI's language model.
 
@@ -197,13 +204,41 @@ class Chat():
         docs = [Document(page_content=doc[2], metadata={
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
 
-        ##print(f"Templated Query: {flow_query}")
+        print(f"Templated Query: {flow_query}")
+        callback = AsyncIteratorCallbackHandler()
+        self.__client = ChatOpenAI(
+                temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview", streaming=True, callbacks=[callback])
+        
+        self.__chain = Chain.get_chain(self.__client)
 
-        out = self.__chain.stream({"template": flow_query, "documents": docs})
+        async def wrap_done(fn, event):
+            try:
+                await fn
+            except Exception as e:
+                print(f"Caught exception: {e}")
+            finally:
+                event.set()
 
-        for chunk in out:
-            current_content = chunk
-            yield current_content.content
+        task = asyncio.create_task(
+            wrap_done(
+                self.__chain.ainvoke(input={"template": flow_query, "documents": docs}),
+                callback.done
+            )
+        )
+
+        buffer = ""
+        async for token in callback.aiter():
+            buffer += token
+            if " " in buffer:
+                word, buffer = buffer.rsplit(" ", 1)
+                print(f"data: {word}")
+                yield f"data: {word}\n\n"
+
+        if buffer:
+            print(f"data: {buffer}")
+            yield f"data: {buffer}\n\n"
+
+        await task  
 
     def end_chat(self) -> None:
         """
