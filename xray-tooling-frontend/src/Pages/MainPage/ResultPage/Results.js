@@ -9,9 +9,8 @@ import {
 import classIdToBodyPart from './BodyPartMapping.json';
 import './Results.css';
 
-const ResultPage = ({ image, setStage }) => {
-  const [phaseOneResult, setPhaseOneResult] = useState(null);
-  const [phaseTwoResult, setPhaseTwoResult] = useState(null);
+const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseTwoResult, setPhaseTwoResult }) => {
+
 
   const handleRunPhaseOne = async () => {
     try {

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import UploadPage from './UploadPage/upload';
 import ResultPage from './ResultPage/Results';
 import ConsultationPage from './ConsultationPage/consultation';
+import RagPage from './RagPage/Rag';
 import NavBar from '../../Components/NavBar';
 import ProgressBar from '../../Components/ProgressBar';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
@@ -11,6 +12,9 @@ import './Main.css';
 const Main = () => {
     const [stage, setStage] = useState('upload');
     const [image, setImage] = useState(null);
+    const [phaseOneResult, setPhaseOneResult] = useState(null);
+    const [phaseTwoResult, setPhaseTwoResult] = useState(null);
+    const [request, setRequest] = useState(null);
 
     const uploadRef = useRef(null);
     const resultsRef = useRef(null);
@@ -31,8 +35,9 @@ const Main = () => {
                 >
                     <div ref={nodeRef} class="h-full">
                         {stage === 'upload' && <UploadPage setStage={setStage} image={image} setImage={setImage} />}
-                        {stage === 'results' && <ResultPage setStage={setStage} image={image} />}
-                        {stage === 'consultation' && <ConsultationPage setStage={setStage} image={image} />}
+                        {stage === 'results' && <ResultPage setStage={setStage} image={image} setPhaseOneResult={setPhaseOneResult} phaseOneResult={phaseOneResult} setPhaseTwoResult={setPhaseTwoResult} phaseTwoResult={phaseTwoResult}/>}
+                        {stage === 'consultation' && <ConsultationPage setStage={setStage} image={image} setRequest={setRequest}/>}
+                        {stage === 'RAG' && <RagPage setStage={setStage} request={request} phaseOneResult={phaseOneResult} phaseTwoResult={phaseTwoResult}/>}
                     </div>
                 </CSSTransition>
             </SwitchTransition>

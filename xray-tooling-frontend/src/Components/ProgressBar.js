@@ -13,17 +13,17 @@ const ProgressBar = ({stage}) => {
                 </div>
                 <div className="step-name">Upload</div>
             </div>
-            <div className={`stepper-item ${stage === 'results' ? 'active' : (stage === 'consultation' ? 'completed' : '')}`}>
+            <div className={`stepper-item ${stage === 'results' ? 'active' : (stage === 'consultation' || stage === "RAG" ? 'completed' : '')}`}>
                 {stage === 'results' && <div className="arrow"><ArrowDropDownIcon/></div>}
                 <div className="step-counter">
-                    {(stage === 'results' || stage === 'consultation') && <DoneIcon sx={{ color: 'white' }} />}
+                    {(stage === 'results' || stage === 'consultation' || stage==='RAG') && <DoneIcon sx={{ color: 'white' }} />}
                 </div>
                 <div className="step-name">Results</div>
             </div>
-            <div className={`stepper-item ${stage === 'consultation' ? 'active' : ''}`}>
-                {stage === 'consultation' && <div className="arrow"><ArrowDropDownIcon/></div>}
+            <div className={`stepper-item ${stage === 'consultation' || stage === "RAG" ? 'active' : ''}`}>
+                {stage === 'consultation' || stage === 'RAG' && <div className="arrow"><ArrowDropDownIcon/></div>}
                 <div className="step-counter">
-                    {stage === 'consultation' && <DoneIcon sx={{ color: 'white' }} />}
+                    {stage === 'consultation' || stage === 'RAG' && <DoneIcon sx={{ color: 'white' }} />}
                 </div>
                 <div className="step-name">Consultation</div>
             </div>
