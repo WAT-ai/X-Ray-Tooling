@@ -6,32 +6,19 @@ const RagPage = ({ request, injury, injuryLocation }) => {
     //Check if request is for flow, or query
     const [response, setResponse] = useState('')
     const hasSentQuery = useRef(false);
-    const [flowData, setFlowData] = useState({
-        base: "",
-        restriction: "",
-        heat_ice: "",
-        expectation: "",
-    });
-    const [flowDocs, setFlowDocs] = useState({
-        base: [],
-        restriction: [],
-        heat_ice: [],
-        expectation: [],
-      });
-    const [flowMessage, setFlowMessage] = useState("");
-    const [data, setData] = useState("");
     const model = 'openai'
 
-      
+
 
 
     //If it is query, get the query message, and send sendQuery request as soon as rendered
     useEffect(() => {
         if (!hasSentQuery.current) {
             if (request.requestType === 'query') {
-                sendFlows(request.message)
-            } else {
                 sendQuery(request.message)
+            } else {
+                console.log('ran')
+                //flows
             }
             hasSentQuery.current = true;
         }
@@ -91,50 +78,7 @@ const RagPage = ({ request, injury, injuryLocation }) => {
     }
 
 
-  const sendFlows = async (flows) => {
-    if (injury.trim() == '' || injuryLocation.trim() == '') return;
-
-    try {
-      // set loading
-      setFlowMessage("Loading...");
-      const response = await fetch('http://127.0.0.1:8000/rag/flow/async', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ injury: injury, injury_location: injuryLocation, flows: flows, model: model }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log('RAG run:', data);
-        setData(data);
-        
-        console.log(data.responses.length);
-        var fData = {};
-        var fDocs = {};
-
-
-      
-        for (let i = 0; i < data.responses.length; i++){
-          fData[data.responses[i][0]] = data.responses[i][1][0].content;
-          fDocs[data.responses[i][0]] = data.responses[i][1][1].map((doc) => doc.page_content);
-
-        }
-        
-
-        setFlowData(fData);
-        setFlowDocs(fDocs);
-
-        console.log("FData: ",fData);
-        console.log("FDocs: ",fDocs);
-
-
-      }
-    } catch (error) {
-      console.error('Error running RAG:', error);
-    }
-    
-  };
+  
 
 
 
