@@ -237,13 +237,36 @@ async def rag_flow(flow_query: MultiFlowQuery):
 
     return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "responses": coroutine}
 
-
-
-
+'''
 @app.post("/rag/flow/stream")
-async def rag_flow(flow_query: FlowQuery):
+def rag_flow(flow_query: FlowQuery):
     # return run_similarity_search(qu)
 
+    if flow_query.model not in models:
+        return {"error": "model not found."}
+
+    flow = FlowType(flow_query.flow)
+    model = models['openai']
+
+    return StreamingResponse(model.stream_flow_query(flow_query.injury, flow_query.injury_location, flow), media_type="text/event-stream")
+'''
+@app.post("/rag/flow/stream/expectation")
+def rag_flow1(flow_query: FlowQuery):
+    return handle_flow(flow_query)
+
+@app.post("/rag/flow/stream/base")
+def rag_flow2(flow_query: FlowQuery):
+    return handle_flow(flow_query)
+
+@app.post("/rag/flow/stream/heat_ice")
+def rag_flow3(flow_query: FlowQuery):
+    return handle_flow(flow_query)
+
+@app.post("/rag/flow/stream/restriction")
+def rag_flow4(flow_query: FlowQuery):
+    return handle_flow(flow_query)
+
+def handle_flow(flow_query: FlowQuery):
     if flow_query.model not in models:
         return {"error": "model not found."}
 

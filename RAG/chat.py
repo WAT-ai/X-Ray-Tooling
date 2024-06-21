@@ -240,6 +240,10 @@ class Chat():
 
         await task  
 
+        # Yield the docs content
+        for doc in docs:
+            yield f"doc: {doc.page_content}\n\n"
+
     def end_chat(self) -> None:
         """
         Cleans up resources

@@ -1,24 +1,28 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import SideBar from '../../../Components/SideBar';
 
 const RagPage = ({ request, injury, injuryLocation }) => {
 
-    //Check if request is for flow, or query
-    const [response, setResponse] = useState('')
+    const [currentRequest, setCurrentRequest] = useState(request);
+    const [response, setResponse] = useState({
+        'base': '',
+        'heat_ice': '',
+        'expectation': '',
+        'restriction': ''
+    });
     const hasSentQuery = useRef(false);
     const model = 'openai'
 
-
-
-
-    //If it is query, get the query message, and send sendQuery request as soon as rendered
     useEffect(() => {
         if (!hasSentQuery.current) {
             if (request.requestType === 'query') {
                 sendQuery(request.message)
-            } else if (request.requestType === 'flow') {
-                sendRagQuery(request.flow)
-            }
+            } 
+            sendRagQuery('expectation')
+            sendRagQuery('base')
+            sendRagQuery('heat_ice')
+            sendRagQuery('restriction')
             hasSentQuery.current = true;
         }
 
@@ -30,7 +34,7 @@ const RagPage = ({ request, injury, injuryLocation }) => {
         const ctrl = new AbortController();
 
         try {
-            await fetchEventSource('http://127.0.0.1:8000/rag/flow/stream', {
+            await fetchEventSource(`http://127.0.0.1:8000/rag/flow/stream/${flow}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,7 +58,6 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                 onerror: (e) => {
                     if (!!e) {
                         console.log('Fetch onerror', e);
-                        // do something with this error
                     }
                     throw e;
                 },
@@ -65,8 +68,10 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                     }
                     try {
                         const d = data;
-                        console.log(d)
-                        setResponse(prevResponse => prevResponse + ' ' + d)
+                        setResponse(prevResponse => ({
+                            ...prevResponse,
+                            [flow]: prevResponse[flow] + ' ' + d
+                        }));
                     } catch (e) {
                         console.log('Fetch onmessage error', e);
                     }
@@ -130,11 +135,14 @@ const RagPage = ({ request, injury, injuryLocation }) => {
     }
 
     return (
-        <div class="h-full flex flex-col items-center">
-            <div class=" w-4/6 bg-gray-200 text-left p-4">
-                <p>{response}</p>
+        <div class="h-full flex flex-row  justify-start">
+            <div class='w-1/6 h-full'>
+                <SideBar currentRequest={currentRequest} setCurrentRequest={setCurrentRequest}/>
             </div>
             
+            <div class="h-fit w-4/6 bg-gray-200 text-left p-4">
+                <p>{response[currentRequest.flow]}</p>
+            </div>
         </div>
     );
 };
