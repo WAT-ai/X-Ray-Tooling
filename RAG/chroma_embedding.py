@@ -8,11 +8,9 @@ from langchain_community.document_loaders import JSONLoader
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 import shutil
-import os
 import sys
 import importlib
-# from embedding import Embedding
-# just a push test
+from tqdm import tqdm  # Add tqdm for progress bar
 
 
 def dynamic_import_embedding():
@@ -100,21 +98,22 @@ class ChromaEmbedding(Embedding):
 
     def __process_json(self) -> object:
         # Load the original JSON
-        with open(os.path.join(os.path.dirname(__file__),self.__articles_path), "r") as file:
+        with open(os.path.join(os.path.dirname(__file__), self.__articles_path), "r") as file:
             data = json.load(file)
 
         # Process each document
-        for doc in data:
+        for doc in tqdm(data, desc="Processing JSON documents"):  # Add progress bar
             doc['Authors'] = ' , '.join(doc['Authors'])
             doc['FullText'] = ' , '.join(doc['FullText'])
 
         # Save the processed JSON
-        with open(os.path.join(os.path.dirname(__file__),self.__processed_articles_path), "w") as file:
+        with open(os.path.join(os.path.dirname(__file__), self.__processed_articles_path), "w") as file:
             json.dump(data, file, indent=4)
 
     def __load_xray_articles(self) -> object:
         loader = JSONLoader(
-            file_path=os.path.join(os.path.dirname(__file__),self.__processed_articles_path),
+            file_path=os.path.join(os.path.dirname(
+                __file__), self.__processed_articles_path),
             jq_schema='.[].FullText',
             text_content=True)
 
@@ -134,7 +133,7 @@ class ChromaEmbedding(Embedding):
             print("Chroma DB already exists. Skipping creation.")
         else:
             print("Creating Chroma DB...")
-            vector_db = Chroma.from_documents(self.__xray_chunked_articles,  # TODO: REMOVE THE :5
+            vector_db = Chroma.from_documents(tqdm(self.__xray_chunked_articles, desc="Populating Chroma DB"),  # Add progress bar
                                               self.__embedding_in_use,
                                               persist_directory=self.__persist_chroma_directory)
 
@@ -151,7 +150,6 @@ class ChromaEmbedding(Embedding):
         else:
             vector_db = Chroma(
                 persist_directory=self.__persist_chroma_directory,
-                # Corrected to use the private attribute
                 embedding_function=self.__embedding_in_use,
             )
 
@@ -171,7 +169,7 @@ class ChromaEmbedding(Embedding):
         # TODO restrict return doc amount to self.__num_matches
         docs = self.__chroma_db.similarity_search(query)
         parsed_docs = []
-        for doc in docs:
+        for doc in tqdm(docs, desc="Parsing retrieved documents"):  # Add progress bar
             parsed_docs.append(
                 (0.0, doc.metadata['seq_num'], doc.page_content))
         return parsed_docs
@@ -183,7 +181,7 @@ class ChromaEmbedding(Embedding):
         self.clear()
         self.__load_and_chunk_articles()
         self.__chroma_db = Chroma.from_documents(
-            self.__xray_chunked_articles)
+            tqdm(self.__xray_chunked_articles, desc="Reuploading to Chroma DB"))  # Add progress bar
 
     def check_db_populated(self):
         try:

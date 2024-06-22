@@ -1,11 +1,3 @@
-"""
-Functions:
-1. Chunking and preprocessing documents
-2. Creating and populating tree
-3. Collapsing the tree
-4. Querying the tree
-"""
-
 import os
 import json
 from dotenv import load_dotenv
@@ -18,6 +10,7 @@ import shutil
 import sys
 import importlib
 from RAG.tree_builder import TreeBuilder
+from tqdm import tqdm
 
 
 def dynamic_import_embedding():
@@ -48,7 +41,7 @@ if Embedding is not None:
 load_dotenv(override=True)
 
 
-class Raptor():
+class Raptor(Embedding):
     def __init__(
         self,
         dataset_path="datasets/"
@@ -72,7 +65,7 @@ class Raptor():
             data = json.load(file)
 
         # Process each document
-        for doc in data:
+        for doc in tqdm(data, desc="Processing JSON documents"):
             doc['Authors'] = ' , '.join(doc['Authors'])
             doc['FullText'] = ' , '.join(doc['FullText'])
 
@@ -90,9 +83,14 @@ class Raptor():
         return loader.load()
 
     def __chunk_documents(self, documents, chunk_size=1000, chunk_overlap=200) -> object:
-        text_splitter = RecursiveCharacterTextSplitter(
+        d_sorted = sorted(documents, key=lambda x: x.metadata["source"])
+        d_reversed = list(reversed(d_sorted))
+        concatenated_content = "\n\n\n --- \n\n\n".join(
+            [doc.page_content for doc in d_reversed]
+        )
+        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-        return text_splitter.split_documents(documents)
+        return text_splitter.split_text(concatenated_content)
 
     def build_tree(self, level=1, n_levels=3):
         tree_builder = TreeBuilder(
@@ -106,17 +104,20 @@ class Raptor():
 
     def collapse_tree(self, results):
         all_texts = self.__xray_chunked_articles
-        for level in sorted(results.keys()):
+        for level in tqdm(sorted(results.keys()), desc="Collapsing tree"):
             summaries = results[level][1]["summaries"].tolist()
             all_texts.extend(summaries)
 
-        vectorstore = Chroma.from_documents(
+        vectorstore = Chroma.from_texts(
             texts=all_texts, embedding=self.__embedding_open)
         return vectorstore
 
-    def query(self, query_text):
-        response = self.__vectorstore.similarity_search(query_text)
-        return response
+    def get_similar_documents(self, query_text):
+        docs = self.__vectorstore.similarity_search(query_text)
+        return docs
+
+    def clear(self):
+        self.__vectorstore.clear()
 
 
 if __name__ == "__main__":

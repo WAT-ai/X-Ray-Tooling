@@ -5,21 +5,19 @@ import umap
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from sklearn.mixture import GaussianMixture
+from tqdm import tqdm
 
 
 class TreeBuilder:
 
     def __init__(self,
-                 embeddings: Optional[np.ndarray] = None,
                  texts: Optional[List[str]] = None,
-                 embd=None,  # Assuming embd is an external embedding model
-                 model=None,  # Assuming model is an external language model
+                 embd=None,
                  random_seed: int = 224) -> None:
         self.random_seed = random_seed
-        self.embeddings = embeddings
+        self.embeddings = None
         self.texts = texts
         self.embd = embd
-        self.model = model
 
     def set_embedding_model(self, embd) -> None:
         self.embd = embd
@@ -96,7 +94,7 @@ class TreeBuilder:
         max_clusters = min(max_clusters, len(embeddings))
         n_clusters = np.arange(1, max_clusters)
         bics = []
-        for n in n_clusters:
+        for n in tqdm(n_clusters, desc="Finding optimal clusters"):
             gm = GaussianMixture(n_components=n, random_state=random_state)
             gm.fit(embeddings)
             bics.append(gm.bic(embeddings))
@@ -156,7 +154,7 @@ class TreeBuilder:
         total_clusters = 0
 
         # Iterate through each global cluster to perform local clustering
-        for i in range(n_global_clusters):
+        for i in tqdm(range(n_global_clusters), desc="Local clustering"):
             # Extract embeddings belonging to the current global cluster
             global_cluster_embeddings_ = self.embeddings[
                 np.array([i in gc for gc in global_clusters])
@@ -274,7 +272,8 @@ class TreeBuilder:
         expanded_list = []
 
         # Expand DataFrame entries to document-cluster pairings for straightforward processing
-        for index, row in df_clusters.iterrows():
+        # Add progress bar
+        for index, row in tqdm(df_clusters.iterrows(), desc="Expanding clusters", total=df_clusters.shape[0]):
             for cluster in row["cluster"]:
                 expanded_list.append(
                     {"text": row["text"], "embd": row["embd"],
@@ -302,7 +301,7 @@ class TreeBuilder:
         Documentation:
         {context}
         """
-        
+
         prompt = ChatPromptTemplate.from_template(template)
         chain = prompt | self.model | StrOutputParser()
 
@@ -312,7 +311,7 @@ class TreeBuilder:
 
         # Format text within each cluster for summarization
         summaries = []
-        for i in all_clusters:
+        for i in tqdm(all_clusters, desc="Generating summaries"):
             df_cluster = expanded_df[expanded_df["cluster"] == i]
             formatted_txt = self.fmt_txt(df_cluster)
             summaries.append(chain.invoke({"context": formatted_txt}))
