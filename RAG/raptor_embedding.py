@@ -18,13 +18,41 @@ import shutil
 import sys
 import importlib
 from RAG.tree_builder import TreeBuilder
-from langchain_core.runnables import RunnablePassthrough
 
-class Raptor:
+
+def dynamic_import_embedding():
+    # Construct the module name based on the script's execution directory
+    # E.g., if you are in "path/to/module" and script is "dynamic_import.py",
+    # it would translate to "path.to.module"
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    # Add the directory containing the package to the system path.
+    sys.path.append(os.path.dirname(current_path))
+
+    # This might be the "package" if your file is in the root of the "package".
+    module_directory = os.path.basename(current_path)
+    try:
+        # "module_directory" could be the result of any directory manipulation
+        # logic you come up with based on __file__ or cwd.
+        module = importlib.import_module(f"{module_directory}.embedding")
+        Embedding = getattr(module, "Embedding")
+        return Embedding
+    except (ImportError, AttributeError):
+        print("Could not dynamically import Embedding.")
+        return None
+
+
+# Now, you can use this function to dynamically import `Embedding`:
+Embedding = dynamic_import_embedding()
+if Embedding is not None:
+    print("Embedding imported successfully!")
+load_dotenv(override=True)
+
+
+class Raptor():
     def __init__(
         self,
         dataset_path="datasets/"
-        ):
+    ):
 
         self.__open_key = os.getenv('OPENAI_API_KEY')
         self.__embedding_open = OpenAIEmbeddings(
@@ -40,7 +68,7 @@ class Raptor:
 
     def __process_json(self) -> object:
         # Load the original JSON
-        with open(os.path.join(os.path.dirname(__file__),self.__articles_path), "r") as file:
+        with open(os.path.join(os.path.dirname(__file__), self.__articles_path), "r") as file:
             data = json.load(file)
 
         # Process each document
@@ -49,12 +77,13 @@ class Raptor:
             doc['FullText'] = ' , '.join(doc['FullText'])
 
         # Save the processed JSON
-        with open(os.path.join(os.path.dirname(__file__),self.__processed_articles_path), "w") as file:
+        with open(os.path.join(os.path.dirname(__file__), self.__processed_articles_path), "w") as file:
             json.dump(data, file, indent=4)
-            
+
     def __load_xray_articles(self) -> object:
         loader = JSONLoader(
-            file_path=os.path.join(os.path.dirname(__file__),self.__processed_articles_path),
+            file_path=os.path.join(os.path.dirname(
+                __file__), self.__processed_articles_path),
             jq_schema='.[].FullText',
             text_content=True)
 
@@ -71,7 +100,8 @@ class Raptor:
             embd=self.__embedding_open,
         )
 
-        results = tree_builder.recursive_embed_cluster_summarize(level=level, n_levels=n_levels)
+        results = tree_builder.recursive_embed_cluster_summarize(
+            level=level, n_levels=n_levels)
         return results
 
     def collapse_tree(self, results):
@@ -79,13 +109,15 @@ class Raptor:
         for level in sorted(results.keys()):
             summaries = results[level][1]["summaries"].tolist()
             all_texts.extend(summaries)
-        
-        vectorstore = Chroma.from_documents(texts=all_texts, embedding=self.__embedding_open)
+
+        vectorstore = Chroma.from_documents(
+            texts=all_texts, embedding=self.__embedding_open)
         return vectorstore
-    
+
     def query(self, query_text):
         response = self.__vectorstore.similarity_search(query_text)
         return response
+
 
 if __name__ == "__main__":
     baby_raptor = Raptor()
