@@ -23,7 +23,7 @@ from langchain_core.runnables import RunnablePassthrough
 class Raptor:
     def __init__(
         self,
-        dataset_path="RAG/datasets/"
+        dataset_path="datasets/"
         ):
 
         self.__open_key = os.getenv('OPENAI_API_KEY')
@@ -35,10 +35,23 @@ class Raptor:
         self.__xray_articles = self.__load_xray_articles()
         self.__xray_chunked_articles = self.__chunk_documents(
             self.__xray_articles)
-        self.__results = build_tree(level=1, n_levels=3)
-        self.__vectorstore = collapse_tree(results=self.__results)
+        self.__results = self.build_tree(level=1, n_levels=3)
+        self.__vectorstore = self.collapse_tree(results=self.__results)
 
+    def __process_json(self) -> object:
+        # Load the original JSON
+        with open(os.path.join(os.path.dirname(__file__),self.__articles_path), "r") as file:
+            data = json.load(file)
 
+        # Process each document
+        for doc in data:
+            doc['Authors'] = ' , '.join(doc['Authors'])
+            doc['FullText'] = ' , '.join(doc['FullText'])
+
+        # Save the processed JSON
+        with open(os.path.join(os.path.dirname(__file__),self.__processed_articles_path), "w") as file:
+            json.dump(data, file, indent=4)
+            
     def __load_xray_articles(self) -> object:
         loader = JSONLoader(
             file_path=os.path.join(os.path.dirname(__file__),self.__processed_articles_path),
