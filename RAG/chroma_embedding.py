@@ -99,7 +99,7 @@ class ChromaEmbedding(Embedding):
 
     def __process_json(self) -> object:
         # Load the original JSON
-        with open(os.path.join(os.path.dirname(__file__),self.__articles_path), "r") as file:
+        with open(os.path.join(os.path.dirname(__file__), self.__articles_path), "r") as file:
             data = json.load(file)
 
         # Process each document
@@ -108,12 +108,13 @@ class ChromaEmbedding(Embedding):
             doc['FullText'] = ' , '.join(doc['FullText'])
 
         # Save the processed JSON
-        with open(os.path.join(os.path.dirname(__file__),self.__processed_articles_path), "w") as file:
+        with open(os.path.join(os.path.dirname(__file__), self.__processed_articles_path), "w") as file:
             json.dump(data, file, indent=4)
 
     def __load_xray_articles(self) -> object:
         loader = JSONLoader(
-            file_path=os.path.join(os.path.dirname(__file__),self.__processed_articles_path),
+            file_path=os.path.join(os.path.dirname(
+                __file__), self.__processed_articles_path),
             jq_schema='.[].FullText',
             text_content=True)
 
