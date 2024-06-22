@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.5.16)  10 MAR 2024 23:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2024.3.10)  27 MAY 2024 00:17
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/hargunmujral/Desktop/Repos/X-Ray-Tooling/report_documents/CUCAI_paper.tex
-(/Users/hargunmujral/Desktop/Repos/X-Ray-Tooling/report_documents/CUCAI_paper.tex
+**/Users/alialh/Documents/Programming/WatAI/X-Ray-Tooling/report_documents/CUCAI_paper.tex
+(/Users/alialh/Documents/Programming/WatAI/X-Ray-Tooling/report_documents/CUCAI_paper.tex
 LaTeX2e <2022-11-01> patch level 1
 L3 programming layer <2023-02-22> (/usr/local/texlive/2023/texmf-dist/tex/latex/ieeetran/IEEEtran.cls
 Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
@@ -401,11 +401,11 @@ Package hyperref Info: Link coloring OFF on input line 37.
 
 
 ]
-LaTeX Font Info:    Trying to load font information for U+msa on input line 193.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 194.
  (/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 193.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 194.
  (/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
@@ -422,39 +422,43 @@ Underfull \hbox (badness 10000) in paragraph at lines 246--247
 pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.250 
+l.249 
       
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.250 
+l.249 
       ] [3
 pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.325 
+l.324 
       
 pdfTeX warning (ext4): destination with the same identifier (name{table.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.325 
+l.324 
       ]
-<RAG_flow.png, id=174, 1745.52126pt x 1084.05pt>
+Underfull \hbox (badness 1902) in paragraph at lines 357--358
+ \OT1/ptm/m/it/10 2) Doc-u-ment Chunk-ing: [][][] \OT1/ptm/m/n/10 To split the doc-u-ments into
+ []
+
+<RAG_flow.png, id=196, 1745.52126pt x 1084.05pt>
 File: RAG_flow.png Graphic file (type png)
 <use RAG_flow.png>
-Package pdftex.def Info: RAG_flow.png  used on input line 384.
+Package pdftex.def Info: RAG_flow.png  used on input line 388.
 (pdftex.def)             Requested size: 252.0pt x 156.49677pt.
 [4
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.401 
+l.409 
       
 pdfTeX warning (ext4): destination with the same identifier (name{table.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.399 
-      ] (./CUCAI_paper.bbl)
+l.409 
+       <./RAG_flow.png>] (./CUCAI_paper.bbl)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -466,31 +470,26 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[5
-pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.446 \end{document}
-                     <./RAG_flow.png>] (./CUCAI_paper.aux)
+[5] (./CUCAI_paper.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `CUCAI_paper.out' has not changed.
-(rerunfilecheck)             Checksum: 37FA86891885778BE7B530F27C49BE42;3713.
+(rerunfilecheck)             Checksum: 78F0E6376B8E07EB85BB052B99A00216;4390.
  ) 
 Here is how much of TeX's memory you used:
- 11128 strings out of 476025
- 176016 string characters out of 5790017
- 1878388 words of memory out of 5000000
- 31379 multiletter control sequences out of 15000+600000
+ 11138 strings out of 476025
+ 176240 string characters out of 5790017
+ 1879388 words of memory out of 5000000
+ 31384 multiletter control sequences out of 15000+600000
  550420 words of font info for 104 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,10n,76p,1319b,436s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,10n,76p,1327b,439s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2023/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on CUCAI_paper.pdf (5 pages, 255466 bytes).
+Output written on CUCAI_paper.pdf (5 pages, 255371 bytes).
 PDF statistics:
- 231 PDF objects out of 1000 (max. 8388607)
- 194 compressed objects within 2 object streams
- 50 named destinations out of 1000 (max. 500000)
- 174 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 255 PDF objects out of 1000 (max. 8388607)
+ 215 compressed objects within 3 object streams
+ 55 named destinations out of 1000 (max. 500000)
+ 214 words of extra memory for PDF output out of 10000 (max. 10000000)
 
