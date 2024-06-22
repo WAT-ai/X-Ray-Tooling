@@ -44,7 +44,7 @@ load_dotenv(override=True)
 class Raptor(Embedding):
     def __init__(
         self,
-        dataset_path="datasets/"
+        dataset_path="RAG/datasets/"
     ):
 
         self.__open_key = os.getenv('OPENAI_API_KEY')
