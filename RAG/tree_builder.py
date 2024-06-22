@@ -289,20 +289,20 @@ class TreeBuilder:
 
         print(f"--Generated {len(all_clusters)} clusters--")
 
-        # Summarization
-        template = """Here are documents related to industrial documents.
-
-        These documents contain information important to the user.
+        # Summarization - fix template for our use case <-------
+        template = """Here are documents related to X-ray imaging and diagnosis.
 
         The information may include, but not limited to:
-        - quantities/magnitude of specific materials or restrictions
-        - units of measurements
-        - time and dates
-        - repair frequency
-
-        Context:
+        - recovery time period
+        - rehabilitation steps
+        - restrictions during the recovery period
+        - general medical advice related to x-rays
+        - information about conditions and injuries diagnosable by x-rays
+        
+        Documentation:
         {context}
         """
+        
         prompt = ChatPromptTemplate.from_template(template)
         chain = prompt | self.model | StrOutputParser()
 
