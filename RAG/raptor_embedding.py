@@ -44,20 +44,25 @@ load_dotenv(override=True)
 class Raptor(Embedding):
     def __init__(
         self,
-        dataset_path="RAG/datasets/"
+        dataset_path="datasets/"
     ):
 
         self.__open_key = os.getenv('OPENAI_API_KEY')
         self.__embedding_open = OpenAIEmbeddings(
             openai_api_key=self.__open_key)
+        self.__persist_chroma_directory = 'collapsed_tree_db'
         self.__processed_articles_path = dataset_path + "xray_articles_processed.json"
         self.__articles_path = dataset_path + "xray_articles.json"
         self.__process_json()  # Ensure this method is called before loading articles
         self.__xray_articles = self.__load_xray_articles()
         self.__xray_chunked_articles = self.__chunk_documents(
             self.__xray_articles)
-        self.__results = self.build_tree(level=1, n_levels=3)
-        self.__vectorstore = self.collapse_tree(results=self.__results)
+        self.__results = self.__build_tree(level=1, n_levels=3)
+        self.__tree_db = None
+        if not os.path.isdir('./collapsed_tree_db'):
+            self.__collapse_tree(results=self.__results)
+
+        self.load_tree_db()
 
     def __process_json(self) -> object:
         # Load the original JSON
@@ -92,7 +97,8 @@ class Raptor(Embedding):
             chunk_size=chunk_size, chunk_overlap=chunk_overlap)
         return text_splitter.split_text(concatenated_content)
 
-    def build_tree(self, level=1, n_levels=3):
+    def __build_tree(self, level=1, n_levels=3):
+        print("Building tree...")
         tree_builder = TreeBuilder(
             texts=self.__xray_chunked_articles,
             embd=self.__embedding_open,
@@ -102,26 +108,38 @@ class Raptor(Embedding):
             level=level, n_levels=n_levels)
         return results
 
-    def collapse_tree(self, results):
+    def __collapse_tree(self, results):
         all_texts = self.__xray_chunked_articles
         for level in tqdm(sorted(results.keys()), desc="Collapsing tree"):
             summaries = results[level][1]["summaries"].tolist()
             all_texts.extend(summaries)
 
         vectorstore = Chroma.from_texts(
-            texts=all_texts, embedding=self.__embedding_open)
-        return vectorstore
+            texts=all_texts, embedding=self.__embedding_open, persist_directory=self.__persist_chroma_directory)
+        self.__tree_db = vectorstore
+        return
+
+    def load_tree_db(self):
+        if self.__tree_db:
+            print("Chroma DB already loaded.")
+        else:
+            vector_db = Chroma(
+                persist_directory=self.__persist_chroma_directory,
+                embedding_function=self.__embedding_open,
+            )
+
+            self.__tree_db = vector_db
 
     def get_similar_documents(self, query_text):
-        docs = self.__vectorstore.similarity_search(query_text)
+        docs = self.__tree_db.similarity_search(query_text)
         return docs
 
     def clear(self):
-        self.__vectorstore.clear()
+        self.__tree_db.clear()
 
 
 if __name__ == "__main__":
     baby_raptor = Raptor()
     question = "What bones can an x-ray identify?"
-    answer = baby_raptor.query(question)
+    answer = baby_raptor.get_similar_documents(question)
     print(f"Answer to question '{question}' is '{answer}'")
