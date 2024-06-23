@@ -6,6 +6,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAI
 import shutil
 import sys
 import importlib
@@ -44,12 +45,16 @@ load_dotenv(override=True)
 class Raptor(Embedding):
     def __init__(
         self,
-        dataset_path="datasets/"
+        dataset_path="datasets/",
+        embedding_model="text-embedding-3-small",
+        llm_model="gpt-3.5-turbo-0125"
     ):
 
         self.__open_key = os.getenv('OPENAI_API_KEY')
         self.__embedding_open = OpenAIEmbeddings(
-            openai_api_key=self.__open_key)
+            openai_api_key=self.__open_key, model=embedding_model)
+        self.llm = OpenAI(openai_api_key=self.__open_key,
+                          model=llm_model)
         self.__persist_chroma_directory = 'collapsed_tree_db'
         self.__processed_articles_path = dataset_path + "xray_articles_processed.json"
         self.__articles_path = dataset_path + "xray_articles.json"
@@ -87,7 +92,7 @@ class Raptor(Embedding):
 
         return loader.load()
 
-    def __chunk_documents(self, documents, chunk_size=1000, chunk_overlap=200) -> object:
+    def __chunk_documents(self, documents, chunk_size=1000, chunk_overlap=100) -> object:
         d_sorted = sorted(documents, key=lambda x: x.metadata["source"])
         d_reversed = list(reversed(d_sorted))
         concatenated_content = "\n\n\n --- \n\n\n".join(
@@ -102,6 +107,7 @@ class Raptor(Embedding):
         tree_builder = TreeBuilder(
             texts=self.__xray_chunked_articles,
             embd=self.__embedding_open,
+            model=self.llm,
         )
 
         print("Embedding and clustering...")
@@ -137,11 +143,56 @@ class Raptor(Embedding):
         return docs
 
     def clear(self):
-        self.__tree_db.clear()
+        ids_to_delete = []
 
+        for doc in self.__chroma_db:
+            if doc.metadata.get('source') == self.__xray_chunked_articles:
+                ids_to_delete.append(doc.id)
+
+        self.__tree_db.delete(ids=ids_to_delete)
+
+
+# if __name__ == "__main__":
+#     baby_raptor = Raptor()
+#     question = "What bones can an x-ray identify?"
+#     answer = baby_raptor.get_similar_documents(question)
+#     print(f"Answer to question '{question}' is '{answer}'")
 
 if __name__ == "__main__":
-    baby_raptor = Raptor()
-    question = "What bones can an x-ray identify?"
-    answer = baby_raptor.get_similar_documents(question)
-    print(f"Answer to question '{question}' is '{answer}'")
+    parser = argparse.ArgumentParser(description="Raptor Embedding Tool")
+
+    # Option to choose between OpenAI and HuggingFace embeddings
+    parser.add_argument('--embedding_model', type=str,
+                        default="text-embedding-3-small", help="OpenAI embedding model")
+    parser.add_argument('--llm_model', type=str,
+                        default="gpt-3.5-turbo-0125", help="OpenAI language model")
+
+    # Commands for different operations
+    subparsers = parser.add_subparsers(dest='operation', help='Operations')
+
+    # Add subparsers for each operation
+    subparsers.add_parser(
+        'build', help='Create and populate the tree and collapse it into Chroma DB')
+    subparsers.add_parser(
+        'load', help='Load the collapsed tree from Chroma DB')
+    subparsers.add_parser('retrieve', help='Retrieve documents based on query').add_argument(
+        'query', type=str, help='Query for document retrieval')
+    subparsers.add_parser('clear', help='Clear Chroma DB')
+
+    args = parser.parse_args()
+
+    # Initialize Raptor with or without OpenAI embeddings based on the command line argument
+    raptor = Raptor(embedding_model=args.embedding_model,
+                    llm_model=args.llm_model)
+
+    # Handle operations
+    if args.operation == 'build':
+        raptor.__build_tree()
+    elif args.operation == 'load':
+        raptor.load_tree_db()
+    elif args.operation == 'retrieve':
+        print(raptor.get_similar_documents(args.query))
+    elif args.operation == 'clear':
+        raptor.clear()
+    else:
+        parser.print_help()

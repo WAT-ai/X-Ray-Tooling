@@ -12,9 +12,11 @@ class TreeBuilder:
 
     def __init__(self,
                  texts: Optional[List[str]] = None,
+                 model=None,
                  embd=None,
                  random_seed: int = 224) -> None:
         self.random_seed = random_seed
+        self.model = model
         self.embeddings = None
         self.texts = texts
         self.embd = embd
