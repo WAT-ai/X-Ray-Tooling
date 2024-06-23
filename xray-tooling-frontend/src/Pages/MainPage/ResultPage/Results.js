@@ -116,7 +116,6 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
             <div class="flex flex-col items-start h-1/2 w-full border-solid border-2 border-blue-500 rounded-lg p-8">
               <h1 class="text-3xl font-bold text-left">Body Part Classification: {phaseTwoResult ? phaseTwoResult : 'Loading...'}</h1>
               <h1 class="text-2xl pt-3 pb-5 text-left">Specific bone fractures most likely require unique rehabilitation plans.</h1>
-
               
               <Select
                 displayEmpty
@@ -142,7 +141,10 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
           </div>
 
         </div>
+        <button className="results-submit" onClick={handleSubmit}>Submit</button>
+
       </div>
+    
     </div>
 
   );
