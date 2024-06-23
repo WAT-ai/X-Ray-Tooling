@@ -86,65 +86,65 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
   const url = URL.createObjectURL(image[0]);
 
   return (
-    <div className="results-page">
-      <div className="results-title-container">
-        <h1>2. Results</h1>
+    <div class="flex flex-col h-full">
+      <div class="flex-none flex items-end w-5/6 py-8 mt-8 mx-auto" style={{ height: "10%" }}>
+        <h1 class="text-4xl font-bold">2. Diagnosis </h1>
       </div>
-      <div className='results-parent'>
-        <div className="results-content-container">
-          <div className="box-frame-container">
-            <Box className="box-frame-1" sx={{ flex: 1 }}>
-              <Typography variant='h4' sx={{ textAlign: 'left', marginBottom: '5px' }}>
-                <span style={{ color: '#4686ee' }}>Fracture Classification:</span> <span style={{ color: 'black' }}>{phaseOneResult ? phaseOneResult : 'Loading...'}</span>
-              </Typography>
-              <Typography variant='h5' sx={{ color: 'grey', textAlign: 'left' }}>
-                If fractures are present, we suggest consulting with your doctor or engaging with our <span sx={{ color: '#4686ee' }}>AI chatbot</span> to inquire about the optimal steps to take.
-              </Typography>
-              <Select
-                displayEmpty
-                value={phaseOneResult ? phaseOneResult : ''}
-                onChange={handlePhaseOneSelectChange}
-                sx={{ minWidth: '100px', marginLeft: '10px' }}
-                renderValue={(selected) => {
-                  if (selected === '') {
-                    return <em>Override</em>;
-                  }
-                  return selected;
-                }}
-              >
-                <MenuItem value="Fractured">Fractured</MenuItem>
-                <MenuItem value="Not Fractured">Not Fractured</MenuItem>
-              </Select>
-            </Box>
-            <Box className="box-frame-2" sx={{ flex: 1 }}>
-              <Typography variant='h4' sx={{ textAlign: 'left', marginBottom: '5px' }}>
-                <span style={{ color: '#4686ee' }}>Body Part Classification:</span> <span style={{ color: 'black' }}>{phaseTwoResult ? phaseTwoResult : 'Loading...'}</span>
-              </Typography>
-              <Typography variant='h5' sx={{ color: 'grey', textAlign: 'left' }}>Specific bone fractures most likely require unique rehabilitation plans.</Typography>
+      <div class="flex flex-col items-start w-5/6 mx-auto h-full">
+        <div class="flex flex-row h-5/6 space-x-5">
+          
+          <div class="w-7/12 flex flex-grow flex-col space-y-5">
+            <div class="flex flex-col items-start h-1/2 w-full border-solid border-2 border-blue-500 rounded-lg p-8">
+              <h1 class="text-3xl font-bold text-left"> Fracture Classification: {phaseOneResult ? phaseOneResult : 'Loading...'} </h1>
+              <h1 class="text-2xl pt-3 pb-3 text-left">If fractures are present, we suggest consulting your doctor or engaging our AI chatbot to inquire about the optimal steps to take.</h1>
+                <Select
+                  displayEmpty
+                  value={phaseOneResult ? phaseOneResult : ''}
+                  onChange={handlePhaseOneSelectChange}
+                  sx={{ minWidth: '100px', marginLeft: '0px' }}
+                  renderValue={(selected) => {
+                    if (selected === '') {
+                      return <em>Override</em>;
+                    }
+                    return selected;
+                  }}
+                >
+                  <MenuItem value="Fractured">Fractured</MenuItem>
+                  <MenuItem value="Not Fractured">Not Fractured</MenuItem>
+                </Select>
+            </div>
+            <div class="flex flex-col items-start h-1/2 w-full border-solid border-2 border-blue-500 rounded-lg p-8">
+              <h1 class="text-3xl font-bold text-left">Body Part Classification: {phaseTwoResult ? phaseTwoResult : 'Loading...'}</h1>
+              <h1 class="text-2xl pt-3 pb-5 text-left">Specific bone fractures most likely require unique rehabilitation plans.</h1>
+
+              
               <Select
                 displayEmpty
                 value={phaseTwoResult ? phaseTwoResult : ''}
                 onChange={handlePhaseTwoSelectChange}
-                sx={{ minWidth: '100px', marginLeft: '10px' }}
+                sx={{ minWidth: '100px', marginLeft: '0px' }}
                 renderValue={(selected) => {
                   if (selected === '') {
                     return <em>Override</em>;
                   }
                   return selected;
                 }}
-              >
-                {Object.entries(classIdToBodyPart).map(([id, bodyPart]) => (
-                  <MenuItem key={id} value={bodyPart}>{bodyPart}</MenuItem>
+                >
+                  {Object.entries(classIdToBodyPart).map(([id, bodyPart]) => (
+                    <MenuItem key={id} value={bodyPart}>{bodyPart}</MenuItem>
                 ))}
               </Select>
-            </Box>
+            </div>
           </div>
-          <img src={url} className="results-image" />
-        </div>
-        <button className="results-submit" onClick={handleSubmit}>Submit</button>
-      </div>
+          
+          <div class="w-5/12"> 
+            <img src={url} className="results-image" />
+          </div>
 
+        </div>
+      </div>
     </div>
+
   );
 };
 
