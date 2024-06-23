@@ -104,8 +104,10 @@ class Raptor(Embedding):
             embd=self.__embedding_open,
         )
 
+        print("Embedding and clustering...")
         results = tree_builder.recursive_embed_cluster_summarize(
             level=level, n_levels=n_levels)
+
         return results
 
     def __collapse_tree(self, results):
