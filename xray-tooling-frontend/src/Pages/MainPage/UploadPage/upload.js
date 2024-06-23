@@ -57,18 +57,21 @@ const UploadPage = ({setStage, image, setImage}) => {
 
     
     return (
-        <div className="upload-page">
-            <div className="upload-title-container">
-                <h1>1. Upload</h1>
-            </div>
-            <div className="upload-parent">
-                <div className="file-upload-container">
-                    <div className="label-description">
+      <div class="flex flex-col h-full">
+        <div class="flex-col flex items-start w-5/6 py-8 mt-8 mx-auto space-y-5" style={{ height: "10%" }}>
+          <h1 class="text-4xl font-bold">1. Upload </h1>
+          <h1 class="text-2xl"> Upload your X-ray here. Our tool will analyze it.</h1>
+        </div>
+        <div class="flex flex-col w-5/6 mx-auto h-full">
+          <div class="h-5/6 pt-20">
+            <div class="h-full">
+                <div class="h-full flex flex-col">
+                    <div class="">
                         <Typography variant="body">Upload File</Typography>
                         <Typography variant="subtitle2">You can upload 1 file. File can be up to 50 MB.</Typography>
                     </div>
                     <FileUploader
-                        className="file-upload"
+                        class=""
                         maxSizeInBytes={50 * 1024 ** 2}
                         maxFiles={1}
                         onChange={(e) => handleChange(e)}
@@ -80,7 +83,7 @@ const UploadPage = ({setStage, image, setImage}) => {
                                 <FileCard
                                     className="file-card"
                                     key={name}
-                                    isInvalid={fileRejection != null}
+                                   isInvalid={fileRejection != null}
                                     name={name}
                                     onRemove={handleRemove}
                                     sizeInBytes={size}
@@ -94,10 +97,11 @@ const UploadPage = ({setStage, image, setImage}) => {
                 </div>
                 <button className="upload-submit" onClick={handleSubmit}>Submit</button>
             </div>
-        </div>
-    );
 
-    
+          </div>
+        </div>
+      </div>
+    );
 
 }
 
