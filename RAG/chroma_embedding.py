@@ -73,7 +73,7 @@ class ChromaEmbedding(Embedding):
         self.__embeddings_hugging = HuggingFaceEmbeddings(
             model_name="all-MiniLM-L6-v2")
         self.__embedding_open = OpenAIEmbeddings(
-            openai_api_key=self.__open_key)
+            openai_api_key=self.__open_key, model="text-embedding-3-small")
         self.__persist_chroma_directory = 'db'
         self.__num_matches = num_matches
         self.__processed_articles_path = dataset_path + "xray_articles_processed.json"
