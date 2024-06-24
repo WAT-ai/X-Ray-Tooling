@@ -6,7 +6,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import JSONLoader
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 import shutil
 import sys
 import importlib
@@ -53,8 +53,8 @@ class Raptor(Embedding):
         self.__open_key = os.getenv('OPENAI_API_KEY')
         self.__embedding_open = OpenAIEmbeddings(
             openai_api_key=self.__open_key, model=embedding_model)
-        self.llm = OpenAI(openai_api_key=self.__open_key,
-                          model=llm_model)
+        self.llm = ChatOpenAI(api_key=self.__open_key,
+                              model=llm_model)
         self.__persist_chroma_directory = 'collapsed_tree_db'
         self.__processed_articles_path = dataset_path + "xray_articles_processed.json"
         self.__articles_path = dataset_path + "xray_articles.json"

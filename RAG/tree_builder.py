@@ -251,7 +251,8 @@ class TreeBuilder:
         return "--- --- \n --- --- ".join(unique_txt)
 
     def embed_cluster_summarize_texts(self,
-                                      level: int
+                                      level: int,
+                                      chunk_size: int = 1500  # New parameter for chunk size
                                       ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Embeds, clusters, and summarizes a list of texts. This function first generates embeddings for the texts,
@@ -260,21 +261,18 @@ class TreeBuilder:
 
         Parameters:
         - level: An integer parameter that could define the depth or detail of processing.
+        - chunk_size: The maximum length of each text chunk for summarization.
 
         Returns:
         - Tuple containing two DataFrames:
-          1. The first DataFrame (`df_clusters`) includes the original texts, their embeddings, and cluster assignments.
-          2. The second DataFrame (`df_summary`) contains summaries for each cluster, the specified level of detail,
-             and the cluster identifiers.
+        1. The first DataFrame (`df_clusters`) includes the original texts, their embeddings, and cluster assignments.
+        2. The second DataFrame (`df_summary`) contains summaries for each cluster, the specified level of detail,
+            and the cluster identifiers.
         """
-        # Embed and cluster the texts, resulting in a DataFrame with 'text', 'embd', and 'cluster' columns
         df_clusters = self.embed_cluster_texts()
 
-        # Prepare to expand the DataFrame for easier manipulation of clusters
         expanded_list = []
 
-        # Expand DataFrame entries to document-cluster pairings for straightforward processing
-        # Add progress bar
         for index, row in tqdm(df_clusters.iterrows(), desc="Expanding clusters", total=df_clusters.shape[0]):
             for cluster in row["cluster"]:
                 expanded_list.append(
@@ -282,27 +280,18 @@ class TreeBuilder:
                         "cluster": cluster}
                 )
 
-        # Create a new DataFrame from the expanded list
         expanded_df = pd.DataFrame(expanded_list)
-
-        # Retrieve unique cluster identifiers for processing
         all_clusters = expanded_df["cluster"].unique()
 
         print(f"--Generated {len(all_clusters)} clusters--")
 
-        # Summarization - fix template for our use case <-------
-        template = """Here are documents related to X-ray imaging and diagnosis.
+        template = """Documents on X-ray imaging and diagnosis:
 
-        The information may include, but not limited to:
-        - recovery time period
-        - rehabilitation steps
-        - restrictions during the recovery period
-        - general medical advice related to x-rays
-        - information about conditions and injuries diagnosable by x-rays
-        
-        Documentation:
-        {context}
-        """
+            Give a detailed summary of the following
+
+            Documentation:
+            {context}
+            """
 
         prompt = ChatPromptTemplate.from_template(template)
         chain = prompt | self.model | StrOutputParser()
@@ -311,14 +300,17 @@ class TreeBuilder:
             raise ValueError(
                 "Language model must be set before calling this method.")
 
-        # Format text within each cluster for summarization
         summaries = []
         for i in tqdm(all_clusters, desc="Generating summaries"):
             df_cluster = expanded_df[expanded_df["cluster"] == i]
             formatted_txt = self.fmt_txt(df_cluster)
-            summaries.append(chain.invoke({"context": formatted_txt}))
 
-        # Create a DataFrame to store summaries with their corresponding cluster and level
+            chunks = self.__chunk_text(formatted_txt, chunk_size)
+            chunk_summaries = [chain.invoke(
+                {"context": chunk}) for chunk in chunks]
+            combined_summary = " ".join(chunk_summaries)
+            summaries.append(combined_summary)
+
         df_summary = pd.DataFrame(
             {
                 "summaries": summaries,
@@ -328,6 +320,22 @@ class TreeBuilder:
         )
 
         return df_clusters, df_summary
+
+    def __chunk_text(self, text: str, max_length: int = 1500) -> List[str]:
+        """
+        Chunk the given text into smaller parts each not exceeding max_length tokens.
+
+        Parameters:
+        - text: The input text to be chunked.
+        - max_length: The maximum length of each chunk.
+
+        Returns:
+        - A list of text chunks.
+        """
+        words = text.split()
+        chunks = [' '.join(words[i:i + max_length])
+                  for i in range(0, len(words), max_length)]
+        return chunks
 
     def recursive_embed_cluster_summarize(self,
                                           level: int = 1, n_levels: int = 3
