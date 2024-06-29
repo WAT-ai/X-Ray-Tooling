@@ -127,8 +127,7 @@ const HomePage = () => {
                 <h1 class="pl-5 text-5xl font-bold text-black">Diagnosis</h1>
               </div>
               <div class="w-full mt-5 ml-5 text-left text-4xl">
-                Simply by uploading your X-ray image, our tool will automatically detect detect the location of the xray, with <span class="text-theme-blue">support for over 20 body parts.</span>
-              </div>
+              Get live diagnosis of your x-ray images in <span class="text-theme-blue">minutes</span>            </div>
             </div>
           </div>
         </div>
@@ -144,8 +143,7 @@ const HomePage = () => {
                 <h1 class="pl-5 text-5xl font-bold text-black">Consult</h1>
               </div>
               <div class="w-full mt-5 ml-5 text-left text-4xl">
-                Simply by uploading your X-ray image, our tool will automatically detect detect the location of the xray, with <span class="text-theme-blue">support for over 20 body parts.</span>
-              </div>
+              Ask questions directly related to your injury with <span class="text-theme-blue">real time answers </span>              </div>
             </div>
           </div>
         </div>
