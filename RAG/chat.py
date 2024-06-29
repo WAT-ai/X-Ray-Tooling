@@ -166,6 +166,10 @@ class Chat():
 
         await task      
 
+        # Yield the docs content
+        for doc in docs:
+            yield f"doc: {doc.page_content}\n\n"
+
 
     def flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
         """
@@ -242,7 +246,7 @@ class Chat():
 
         # Yield the docs content
         for doc in docs:
-            yield f"doc: {doc.page_content}\n\n"
+            yield f"data: doc-content:{doc.page_content}\n\n"
 
     def end_chat(self) -> None:
         """

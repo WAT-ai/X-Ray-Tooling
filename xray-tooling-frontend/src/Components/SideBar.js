@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
+import HeatIceIcon from './Icons/HeatIceIcon';
+import ExpectationIcon from './Icons/ExpectationIcon';
+import RestrictionIcon from './Icons/RestrictionIcon';
+import BaseIcon from './Icons/BaseIcon';
 
-const SideBar = ({currentRequest, setCurrentRequest}) => {
+const SideBar = ({flowResponse, requestStack, setRequestStack}) => {
     const [open, setOpen] = useState(false);
 
     const sideBarItems = [
-        { symbol: '🏠', text: 'Base', value:'base' },
-        { symbol: '🏠', text: 'Heat and Ice', value: 'heat_ice' },
-        { symbol: '🏠', text: 'Expectation', value: 'expectation' },
-        { symbol: '🏠', text: 'Restriction', value:'restriction' },
+        { symbol: <BaseIcon/>, text: 'Base', value:'base' },
+        { symbol: <HeatIceIcon />, text: 'Heat and Ice', value: 'heat_ice' },
+        { symbol: <ExpectationIcon/>, text: 'Expectation', value: 'expectation' },
+        { symbol: <RestrictionIcon/>, text: 'Restriction', value:'restriction' },
     ]
 
     const handleItemClick = (item) => {
-        setCurrentRequest({flow: item.value})
+        setRequestStack(prevStack => [...prevStack, {request: {flow: item.value, requestType: 'flow'}, response: flowResponse[item.value].data}])
     }
 
     return (
@@ -21,22 +25,23 @@ const SideBar = ({currentRequest, setCurrentRequest}) => {
             onMouseLeave={() => setOpen(false)}
         >
             {open ? (
-                <div>
+                <div class="">
                     {sideBarItems.map((item, index) => (
-                        <div key={index} class="p-4 hover:bg-blue-700 flex items-center" onClick={() => handleItemClick(item)}>
-                            <span class="mr-2" style={{ pointerEvents: 'auto' }}>{item.symbol}</span>
-                            <span class="animate-slide-in">{item.text}</span>
+                        <div key={index} class={`p-4 hover:bg-blue-700 flex items-center cursor-pointer`} onClick={() => handleItemClick(item)}>                            <span class="mr-2" style={{ pointerEvents: 'auto' }}>{item.symbol}</span>
+                            <span class="animate-slide-in whitespace-nowrap overflow-hidden text-left">{item.text}</span>
                         </div>
                     ))}
                 </div>
             ) : (
-                <div>
+                <div class="">
                     {sideBarItems.map((item, index) => (
-                        <div key={index} class="p-4 hover:bg-blue-700 flex items-center">
+                        <div key={index} class={`p-4 hover:bg-blue-700 flex items-center`}>
                             <span class="mr-2">{item.symbol}</span>
+                            
                         </div>
                     ))}
                 </div>
+                
             )}
         </div>
     );

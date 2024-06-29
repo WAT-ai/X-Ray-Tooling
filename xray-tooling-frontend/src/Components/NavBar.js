@@ -1,22 +1,30 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Typography,
     Button,
     AppBar, Toolbar, Card, CardContent, Paper, Select, MenuItem
 } from '@mui/material';
+import Logo from './Logo.svg'
 
 const NavBar = () => {
+
+    let navigate = useNavigate();
+
+    const handleBeginConsultation = () => {
+        navigate('/Main')
+    }
+
     return (
-        <AppBar sx={{ position: "sticky", backgroundColor: '#2C71D9', height: '60px', width: '100%', borderBottom: 'none', boxShadow: 'none', boxSizing: 'border-box' }}>
+        <AppBar sx={{ position: "sticky", backgroundColor: 'white', height: '60px', width: '100%', borderBottom: 'none', boxShadow: 'none', boxSizing: 'border-box' }}>
             <Toolbar variant="dense" sx={{ justifyContent: 'space-between', borderBottom: 'none', height: '100%', width: '100%', paddingLeft: '25px', paddingRight: '25px', boxSizing: 'border-box' }}>
-                <Typography variant="h6" component="div" sx={{ color: 'black', marginTop: '5px', fontWeight: 'bold' }}>
-                    <span style={{ color: '#4686ee', fontSize: 28 }}>X</span><span style={{ color: 'black', fontSize: 28 }}>Care</span>
-                </Typography>
-                <div sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <Button color="inherit" sx={{ color: 'black' }}>Results</Button>
-                    <Button color="inherit" sx={{ color: 'black' }}>Rehabilitation</Button>
+                <img src={Logo} class="h-1/2" alt="Logo" />
+
+                <div>
+                    <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }}>How it works</Button>
+                    <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }} onClick={handleBeginConsultation}>Consultation</Button>
                 </div>
-                <Button color="inherit" sx={{ color: 'white', backgroundColor: '#4686ee', borderRadius: '20px', width: '100px', '&:hover': { backgroundColor: 'grey' } }} >Log In</Button>
+                <button class="text-black">Log In</button>
             </Toolbar>
         </AppBar>
     );

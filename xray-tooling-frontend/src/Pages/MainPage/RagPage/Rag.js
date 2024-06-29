@@ -1,16 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import SideBar from '../../../Components/SideBar';
+import Stack from '@mui/material/Stack';
+import Response from '../../../Components/Response';
+
 
 const RagPage = ({ request, injury, injuryLocation }) => {
 
-    const [currentRequest, setCurrentRequest] = useState(request);
-    const [response, setResponse] = useState({
-        'base': '',
-        'heat_ice': '',
-        'expectation': '',
-        'restriction': ''
+    const [requestStack, setRequestStack] = useState([]);    
+    const [flowResponse, setFlowResponse] = useState({
+        'base': { data: '', docs: '' },
+        'heat_ice': { data: '', docs: '' },
+        'expectation': { data: '', docs: '' },
+        'restriction': { data: '', docs: '' },
     });
+    const [queryResponse, setQueryResponse] = useState('');
     const hasSentQuery = useRef(false);
     const model = 'openai'
 
@@ -18,15 +22,18 @@ const RagPage = ({ request, injury, injuryLocation }) => {
         if (!hasSentQuery.current) {
             if (request.requestType === 'query') {
                 sendQuery(request.message)
-            } 
-            sendRagQuery('expectation')
-            sendRagQuery('base')
-            sendRagQuery('heat_ice')
-            sendRagQuery('restriction')
+            }
+            sendAllFlowQuery();
             hasSentQuery.current = true;
         }
-
     }, [])
+
+    const sendAllFlowQuery = async () => {
+        sendRagQuery('expectation')
+        sendRagQuery('base')
+        sendRagQuery('heat_ice')
+        sendRagQuery('restriction')
+    }
 
     const sendRagQuery = async (flow) => {
         if (injury.trim() == "" || injuryLocation.trim() == "") return;
@@ -63,15 +70,31 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                 },
                 onmessage: async (ev) => {
                     const data = ev.data;
-                    if (!data) {
+
+                    //in future must change this to add anything with doc-content to a docs section of flow Response
+                    if (!data || data.startsWith('doc-content:')) {
                         return;
                     }
                     try {
-                        const d = data;
-                        setResponse(prevResponse => ({
+                        setFlowResponse(prevResponse => ({
                             ...prevResponse,
-                            [flow]: prevResponse[flow] + ' ' + d
+                            [flow]: {
+                                data: prevResponse[flow]?.data ? prevResponse[flow].data + ' ' + data : data
+                            }
                         }));
+                        if (flow === request.flow) {
+                            setRequestStack(prevStack => {
+                                if (prevStack.length === 0) {
+                                    // If the stack is empty, add a new object
+                                    return [{request: {flow: flow, requestType: request.requestType}, response: data}];
+                                } else {
+                                    // If the stack is not empty, update the data of the first object
+                                    return prevStack.map((item, index) => 
+                                        index === 0 ? {...item, response: item.response + ' ' + data} : item
+                                    );
+                                }
+                            });
+                        }
                     } catch (e) {
                         console.log('Fetch onmessage error', e);
                     }
@@ -121,8 +144,7 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                         }
                         try {
                             const d = data;
-                            console.log(d)
-                            setResponse(prevResponse => prevResponse + ' ' + d)
+                            setQueryResponse(prevResponse => prevResponse + ' ' + d)
                         } catch (e) {
                             console.log('Fetch onmessage error', e);
                         }
@@ -137,12 +159,14 @@ const RagPage = ({ request, injury, injuryLocation }) => {
     return (
         <div class="h-full flex flex-row  justify-start">
             <div class='w-1/6 h-full'>
-                <SideBar currentRequest={currentRequest} setCurrentRequest={setCurrentRequest}/>
+                <SideBar requestStack={requestStack} setRequestStack={setRequestStack} flowResponse={flowResponse}/>
             </div>
-            
-            <div class="h-fit w-4/6 bg-gray-200 text-left p-4">
-                <p>{response[currentRequest.flow]}</p>
-            </div>
+
+            <Stack spacing={2}>
+                {requestStack.map((requestObject, index) => (
+                    <Response key={index} requestObject={requestObject} />
+                ))}
+            </Stack>
         </div>
     );
 };

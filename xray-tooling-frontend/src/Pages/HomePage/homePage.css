@@ -9,3 +9,7 @@
   margin-right: '40%';
   font-weight:  'bolder';
 }
+
+.radial-gradient {
+  background: radial-gradient(ellipse 500px 150px at 30% 60%, rgb(44, 113, 217), rgb(37, 85, 157));
+}
