@@ -66,7 +66,7 @@ class ChromaEmbedding(Embedding):
         self,
         use_openai=False,
         num_matches=5,
-        dataset_path="RAG/datasets/"
+        dataset_path="datasets/"
     ) -> None:
 
         self.__open_key = os.getenv('OPENAI_API_KEY')
@@ -74,7 +74,7 @@ class ChromaEmbedding(Embedding):
             model_name="all-MiniLM-L6-v2")
         self.__embedding_open = OpenAIEmbeddings(
             openai_api_key=self.__open_key, model="text-embedding-3-small")
-        self.__persist_chroma_directory = 'db'
+        self.__persist_chroma_directory = 'RAG_db'
         self.__num_matches = num_matches
         self.__processed_articles_path = dataset_path + "xray_articles_processed.json"
         self.__articles_path = dataset_path + "xray_articles.json"

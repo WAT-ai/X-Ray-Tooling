@@ -45,7 +45,7 @@ load_dotenv(override=True)
 class Raptor(Embedding):
     def __init__(
         self,
-        dataset_path="datasets/",
+        dataset_path="RAG/datasets/",
         embedding_model="text-embedding-3-small",
         llm_model="gpt-3.5-turbo-0125"
     ):
@@ -95,7 +95,7 @@ class Raptor(Embedding):
     def __chunk_documents(self, documents, chunk_size=1000, chunk_overlap=100) -> object:
         d_sorted = sorted(documents, key=lambda x: x.metadata["source"])
         d_reversed = list(reversed(d_sorted))
-        concatenated_content = "\n\n\n --- \n\n\n".join(
+        concatenated_content = "---".join(
             [doc.page_content for doc in d_reversed]
         )
         text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
@@ -103,6 +103,10 @@ class Raptor(Embedding):
         return text_splitter.split_text(concatenated_content)
 
     def __build_tree(self, level=1, n_levels=3):
+        if os.path.isdir('./collapsed_tree_db'):
+            print("Collapsed tree already exists.")
+            return
+
         print("Building tree...")
         tree_builder = TreeBuilder(
             texts=self.__xray_chunked_articles,
@@ -128,6 +132,7 @@ class Raptor(Embedding):
         return
 
     def load_tree_db(self):
+        print("Loading Collapsed Tree DB...")
         if self.__tree_db:
             print("Chroma DB already loaded.")
         else:
@@ -151,12 +156,6 @@ class Raptor(Embedding):
 
         self.__tree_db.delete(ids=ids_to_delete)
 
-
-# if __name__ == "__main__":
-#     baby_raptor = Raptor()
-#     question = "What bones can an x-ray identify?"
-#     answer = baby_raptor.get_similar_documents(question)
-#     print(f"Answer to question '{question}' is '{answer}'")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Raptor Embedding Tool")
