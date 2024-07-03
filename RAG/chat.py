@@ -11,6 +11,7 @@ import argparse
 import dotenv
 from RAG.chroma_embedding import ChromaEmbedding
 from RAG.index_embedding import IndexEmbedding
+from RAG.raptor_embedding import RaptorEmbedding
 from abc import ABC, abstractmethod
 from RAG.flows import FlowType, Flow
 import langchain
@@ -52,7 +53,7 @@ class Chat():
         __max_tokens int: max number of tokns a response to a query can be
     """
 
-    def __init__(self, llm: str = "openai", chroma_embedding=True, use_openai=True, chunking_max_tokens=100, num_matches=5, max_tokens=500, dataset_path="../RAG/datasets/"):
+    def __init__(self, llm: str = "openai", embedding_type="raptor", use_openai=True, chunking_max_tokens=100, num_matches=5, max_tokens=500, dataset_path="../RAG/datasets/"):
         """
         Initializes the Chat class, setting up the embedding model used for queries.
 
@@ -78,19 +79,21 @@ class Chat():
 
         self.__max_tokens = max_tokens
         self.__embedding = None
-        if chroma_embedding:
+        if embedding_type == "chroma":
             self.__embedding = ChromaEmbedding(
                 use_openai=use_openai,
                 num_matches=num_matches,
                 dataset_path=dataset_path
             )
-        else:
+        elif embedding_type == "index":
             self.__embedding = IndexEmbedding(
                 use_openai=use_openai,
                 chunking_max_tokens=chunking_max_tokens,
                 num_matches=num_matches,
                 dataset_path=dataset_path
             )
+        else:
+            self.__embedding = RaptorEmbedding(dataset_path=dataset_path)
 
     def query(self, query) -> str:
         """
@@ -192,8 +195,8 @@ if __name__ == "__main__":
     parser.add_argument('--use_openai_embeddings', action='store_true',
                         help="Use OpenAI embeddings instead of HuggingFace's")
     # Option to choose between vector index and chroma and HuggingFace embeddings
-    parser.add_argument('--use_chroma', action='store_true',
-                        help="Use Chroma db embeddings instead of a vector index")
+    parser.add_argument('--use_embedding_method', action=str,
+                        default="raptor", help="Pick which embedding method to use out of [raptor, index, chroma]")
     # Option to choose between cohere and openai llm
     parser.add_argument('--use_cohere', action='store_true',
                         help="Use cohere llm instead of openai")

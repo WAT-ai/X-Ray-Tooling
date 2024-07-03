@@ -42,10 +42,10 @@ if Embedding is not None:
 load_dotenv(override=True)
 
 
-class Raptor(Embedding):
+class RaptorEmbedding(Embedding):
     def __init__(
         self,
-        dataset_path="RAG/datasets/",
+        dataset_path="../RAG/datasets/",
         embedding_model="text-embedding-3-small",
         llm_model="gpt-3.5-turbo-0125"
     ):
