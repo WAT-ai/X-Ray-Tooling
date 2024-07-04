@@ -2,17 +2,18 @@ import React, { useEffect, useState, useRef } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import SideBar from '../../../Components/SideBar';
 import Stack from '@mui/material/Stack';
-import Response from '../../../Components/Response';
+import RequestResponse from '../../../Components/RequestResponse';
+import QueryRequest from '../../../Components/QueryRequest'
 
 
 const RagPage = ({ request, injury, injuryLocation }) => {
 
-    const [requestStack, setRequestStack] = useState([]);    
+    const [requestStack, setRequestStack] = useState([]);
     const [flowResponse, setFlowResponse] = useState({
-        'base': { data: '', docs: '' },
-        'heat_ice': { data: '', docs: '' },
-        'expectation': { data: '', docs: '' },
-        'restriction': { data: '', docs: '' },
+        'base': { data: '', docs: '', status: '' },
+        'heat_ice': { data: '', docs: '', status: '' },
+        'expectation': { data: '', docs: '', status: '' },
+        'restriction': { data: '', docs: '', status: '' },
     });
     const [queryResponse, setQueryResponse] = useState('');
     const hasSentQuery = useRef(false);
@@ -62,6 +63,16 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                         throw await res.json();
                     }
                 },
+                onclose: async (res) => {
+                    console.log('finished here')
+                    setFlowResponse(prevResponse => ({
+                        ...prevResponse,
+                        [flow]: {
+                            ...prevResponse[flow],
+                            status: 'completed'
+                        }
+                    }));
+                },
                 onerror: (e) => {
                     if (!!e) {
                         console.log('Fetch onerror', e);
@@ -79,18 +90,19 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                         setFlowResponse(prevResponse => ({
                             ...prevResponse,
                             [flow]: {
-                                data: prevResponse[flow]?.data ? prevResponse[flow].data + ' ' + data : data
+                                data: prevResponse[flow]?.data ? prevResponse[flow].data + ' ' + data : data,
+                                status: 'open'
                             }
                         }));
                         if (flow === request.flow) {
                             setRequestStack(prevStack => {
                                 if (prevStack.length === 0) {
                                     // If the stack is empty, add a new object
-                                    return [{request: {flow: flow, requestType: request.requestType}, response: data}];
+                                    return [{ request: { flow: flow, requestType: request.requestType }, response: data, status: 'open' }];
                                 } else {
                                     // If the stack is not empty, update the data of the first object
-                                    return prevStack.map((item, index) => 
-                                        index === 0 ? {...item, response: item.response + ' ' + data} : item
+                                    return prevStack.map((item, index) =>
+                                        index === 0 ? { ...item, response: item.response + ' ' + data, status: 'open' } : item
                                     );
                                 }
                             });
@@ -156,17 +168,29 @@ const RagPage = ({ request, injury, injuryLocation }) => {
         };
     }
 
+    const removeRequestFromStack = (indexToRemove) => {
+        setRequestStack(prevStack => prevStack.filter((_, index) => index !== indexToRemove));
+    }
+
     return (
-        <div class="h-full flex flex-row  justify-start">
+        <div class="h-full flex flex-row justify-start">
             <div class='w-1/6 h-full'>
-                <SideBar requestStack={requestStack} setRequestStack={setRequestStack} flowResponse={flowResponse}/>
+                <SideBar requestStack={requestStack} setRequestStack={setRequestStack} flowResponse={flowResponse} />
             </div>
 
-            <Stack spacing={2}>
-                {requestStack.map((requestObject, index) => (
-                    <Response key={index} requestObject={requestObject} />
-                ))}
-            </Stack>
+            <div class="w-4/6 h-full flex justify-center">
+                <Stack spacing={2} class="w-5/6">
+                    {requestStack.map((queryObject, index) => (
+                        <div>
+                            <RequestResponse queryObject={queryObject} removeRequest={removeRequestFromStack} index={index} />
+                        </div>
+                    ))}
+                    <QueryRequest />
+                </Stack>
+            </div>
+
+            
+
         </div>
     );
 };

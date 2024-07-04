@@ -19,7 +19,8 @@ module.exports = {
         'dark-blue': '#002D62',
         'theme-blue': '#2C71D9',
         'theme-blue-light': 'rgb(44, 113, 217)',
-        'theme-blue-dark': '#25559D'
+        'theme-blue-dark': '#25559D',
+        'response-grey': '#EEEEEE',
       },
       animation: {
         'slide-in': 'slide-in 0.5s forwards',

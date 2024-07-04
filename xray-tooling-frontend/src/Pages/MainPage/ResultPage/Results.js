@@ -66,14 +66,6 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
     setStage('consultation')
   }
 
-  const handleRAG = () => {
-    //navigate('/RAG', { state: { phaseOneResult, phaseTwoResult } });
-  };
-
-  const handleLogin = () => {
-    //navigate('/Login');
-  }
-
   const handlePhaseOneSelectChange = (event) => {
     setPhaseOneResult(event.target.value);
   };

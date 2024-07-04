@@ -1,6 +1,6 @@
 import React from 'react';
-import WhiteLogo from './WhiteLogo.svg'
-import Logo from './Logo.svg'
+import WhiteLogo from '../Assets/WhiteLogo.svg'
+
 
 const Footer = () => {
   return (

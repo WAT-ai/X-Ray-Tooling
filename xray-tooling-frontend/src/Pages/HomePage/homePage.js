@@ -12,13 +12,12 @@ import {
   Button,
   AppBar, Toolbar, Card, CardContent, Paper, Select, MenuItem
 } from '@mui/material';
-import svgFile from './DoctorImage.svg';
-import photoCollage from './photoCollage.svg'
-import diagnosisDemo from './diagnosisDemo.svg'
-import consultDemo from './consultDemo.svg'
+import DoctorImage from '../../Assets/DoctorImage.svg';
+import photoCollage from '../../Assets/photoCollage.svg'
+import diagnosisDemo from '../../Assets/diagnosisDemo.svg'
+import consultDemo from '../../Assets/consultDemo.svg'
 import Footer from '../../Components/Footer';
 import NavBar from '../../Components/NavBar';
-import './homePage.css'
 
 const HomePage = () => {
   const [image, setImage] = useState(null);
@@ -77,7 +76,7 @@ const HomePage = () => {
           </div>
 
           <div class="w-5/12  h-full flex items-start justify-center">
-            <img class="w-5/6 mt-20" src={svgFile} alt="Doctor" />
+            <img class="w-5/6 mt-20" src={DoctorImage} alt="Doctor" />
           </div>
         </div>
         <div class="w-full h-2/3 flex justify-center items-center">
@@ -154,7 +153,7 @@ const HomePage = () => {
 
       <div class="w-full h-auto flex flex-col space-y-4 items-center my-20">
         <div class="w-2/3">
-          <p class="pl-5 text-5xl font text-black mb-10">Leverage your state-of-the-art AI tools to start your rehabilitation journey <span class="font-bold">today!</span></p>
+          <p class="pl-5 text-5xl font text-black mb-10">Leverage state-of-the-art AI tools to start your rehabilitation <span class="font-bold">today!</span></p>
           <div class="flex space-x-4 items-center justify-center">
             <input class="w-2/3 border-2 border-gray-300 rounded-2xl p-2" type="email" placeholder="Enter your email" />
             <button class="w-1/6 bg-blue-500 text-white rounded-2xl p-2 ">Submit</button>
