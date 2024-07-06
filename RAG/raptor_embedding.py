@@ -12,6 +12,9 @@ import sys
 import importlib
 from RAG.tree_builder import TreeBuilder
 from tqdm import tqdm
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import CrossEncoderReranker
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 
 
 def dynamic_import_embedding():
@@ -64,6 +67,7 @@ class RaptorEmbedding(Embedding):
             self.__xray_articles)
         self.__results = self.__build_tree(level=1, n_levels=3)
         self.__tree_db = None
+        self.__retriever = None
         if not os.path.isdir('./collapsed_tree_db'):
             self.__collapse_tree(results=self.__results)
 
@@ -129,6 +133,8 @@ class RaptorEmbedding(Embedding):
         vectorstore = Chroma.from_texts(
             texts=all_texts, embedding=self.__embedding_open, persist_directory=self.__persist_chroma_directory)
         self.__tree_db = vectorstore
+        self.__retriever = Chroma.from_texts(
+            texts=all_texts, embedding=self.__embedding_open, persist_directory=self.__persist_chroma_directory).as_retriever(search_kwargs={"k": 20})
         return
 
     def load_tree_db(self):
@@ -144,7 +150,8 @@ class RaptorEmbedding(Embedding):
             self.__tree_db = vector_db
 
     def get_similar_documents(self, query_text):
-        docs = self.__tree_db.similarity_search(query_text)
+        # docs = self.__tree_db.similarity_search(query_text)
+        docs = self.rerank(query_text)
         return docs
 
     def clear(self):
@@ -156,6 +163,14 @@ class RaptorEmbedding(Embedding):
 
         self.__tree_db.delete(ids=ids_to_delete)
 
+    def rerank(self, prompt):
+        model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
+        compressor = CrossEncoderReranker(model=model, top_n=3)
+        compression_retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=self.__retriever)
+
+        compressed_docs = compression_retriever.invoke(prompt)
+        
+        return compressed_docs
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Raptor Embedding Tool")
