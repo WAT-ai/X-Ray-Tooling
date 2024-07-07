@@ -175,7 +175,7 @@ class RaptorEmbedding(Embedding):
         self.__tree_db.delete(ids=ids_to_delete)
 
     def destroy(self):
-        folder_path = 'RAG_db'
+        folder_path = 'collapsed_tree_db'
         try:
             shutil.rmtree(folder_path)
             print("Chroma DB folder deleted successfully.")
