@@ -10,7 +10,10 @@ from langchain_openai import OpenAIEmbeddings
 import shutil
 import sys
 import importlib
-from tqdm import tqdm  # Add tqdm for progress bar
+from tqdm import tqdm
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import CrossEncoderReranker
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 
 
 def dynamic_import_embedding():
@@ -75,19 +78,16 @@ class ChromaEmbedding(Embedding):
         self.__embedding_open = OpenAIEmbeddings(
             openai_api_key=self.__open_key, model="text-embedding-3-small")
         self.__persist_chroma_directory = 'RAG_db'
-        self.__num_matches = num_matches
         self.__processed_articles_path = dataset_path + "xray_articles_processed.json"
         self.__articles_path = dataset_path + "xray_articles.json"
-
-        # Now, since paths are set, you can proceed with loading and processing
-        self.__process_json()  # Ensure this method is called before loading articles
-        self.__xray_articles = self.__load_xray_articles()
-        self.__xray_chunked_articles = self.__chunk_documents(
-            self.__xray_articles)
         self.__embedding_in_use = self.__embedding_open if use_openai else self.__embeddings_hugging
         print(f"Using {'OpenAI' if use_openai else 'HuggingFace'} Embedding")
         self.__chroma_db = None
         if not os.path.isdir('./db'):
+            self.__process_json()
+            self.__xray_articles = self.__load_xray_articles()
+            self.__xray_chunked_articles = self.__chunk_documents(
+                self.__xray_articles)
             self.create_and_populate_chroma()
 
         self.load_chroma_db()
@@ -97,16 +97,13 @@ class ChromaEmbedding(Embedding):
         self.__xray_chunked_articles = self.__chunk_documents(docs)
 
     def __process_json(self) -> object:
-        # Load the original JSON
         with open(os.path.join(os.path.dirname(__file__), self.__articles_path), "r") as file:
             data = json.load(file)
 
-        # Process each document
-        for doc in tqdm(data, desc="Processing JSON documents"):  # Add progress bar
+        for doc in tqdm(data, desc="Processing JSON documents"):
             doc['Authors'] = ' , '.join(doc['Authors'])
             doc['FullText'] = ' , '.join(doc['FullText'])
 
-        # Save the processed JSON
         with open(os.path.join(os.path.dirname(__file__), self.__processed_articles_path), "w") as file:
             json.dump(data, file, indent=4)
 
@@ -133,7 +130,7 @@ class ChromaEmbedding(Embedding):
             print("Chroma DB already exists. Skipping creation.")
         else:
             print("Creating Chroma DB...")
-            vector_db = Chroma.from_documents(tqdm(self.__xray_chunked_articles, desc="Populating Chroma DB"),  # Add progress bar
+            vector_db = Chroma.from_documents(tqdm(self.__xray_chunked_articles, desc="Populating Chroma DB"),
                                               self.__embedding_in_use,
                                               persist_directory=self.__persist_chroma_directory)
 
@@ -155,7 +152,7 @@ class ChromaEmbedding(Embedding):
 
             self.__chroma_db = vector_db
 
-    def get_similar_documents(self, query) -> list[tuple[float, int, str]]:
+    def get_similar_documents(self, query_text, top_n=3, search_kwargs=20, rerank=True) -> list[tuple[float, int, str]]:
         """
         Retrieves documents from the Chroma database based on a given query.
 
@@ -166,13 +163,22 @@ class ChromaEmbedding(Embedding):
         Returns:
             object: Retrieved documents from the Chroma database.
         """
-        # TODO restrict return doc amount to self.__num_matches
-        docs = self.__chroma_db.similarity_search(query)
-        parsed_docs = []
-        for doc in tqdm(docs, desc="Parsing retrieved documents"):  # Add progress bar
-            parsed_docs.append(
-                (0.0, doc.metadata['seq_num'], doc.page_content))
-        return parsed_docs
+        if rerank:
+            print("Reranking documents...")
+            return self.__rerank(query_text, top_n=top_n,
+                                 search_kwargs=search_kwargs)
+
+        return self.__chroma_db.similarity_search(query_text)
+
+    def __rerank(self, prompt, top_n=3, search_kwargs=20):
+        model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
+        compressor = CrossEncoderReranker(model=model, top_n=top_n)
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=self.__chroma_db.as_retriever(search_kwargs={"k": search_kwargs}))
+
+        compressed_docs = compression_retriever.invoke(prompt)
+
+        return compressed_docs
 
     def reupload_to_chroma(self) -> None:
         """
@@ -181,12 +187,11 @@ class ChromaEmbedding(Embedding):
         self.clear()
         self.__load_and_chunk_articles()
         self.__chroma_db = Chroma.from_documents(
-            tqdm(self.__xray_chunked_articles, desc="Reuploading to Chroma DB"))  # Add progress bar
+            tqdm(self.__xray_chunked_articles, desc="Reuploading to Chroma DB"))
 
     def check_db_populated(self):
         try:
-            # Attempt to fetch a small number of documents as a test
-            sample_query = "xray"  # This can be any string if you're just checking for presence
+            sample_query = "xray"
             results = self.__chroma_db.similarity_search(sample_query)
             if results:
                 print("Chroma DB is populated.")
@@ -229,7 +234,7 @@ class ChromaEmbedding(Embedding):
         return self.__chroma_db
 
     def destroy(self):
-        folder_path = 'db'  # Path to the Chroma DB folder
+        folder_path = 'RAG_db'
         try:
             shutil.rmtree(folder_path)
             print("Chroma DB folder deleted successfully.")
@@ -242,30 +247,44 @@ class ChromaEmbedding(Embedding):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chroma Embedding Tool")
 
-    # Option to choose between OpenAI and HuggingFace embeddings
     parser.add_argument('--use_openai', action='store_true',
                         help="Use OpenAI embeddings instead of HuggingFace's")
 
-    # Commands for different operations
     subparsers = parser.add_subparsers(dest='operation', help='Operations')
 
-    # Add subparsers for each operation
-    subparsers.add_parser('build', help='Create and populate Chroma DB')
-    subparsers.add_parser('load', help='Load Chroma DB')
-    subparsers.add_parser('retrieve', help='Retrieve documents based on query').add_argument(
+    build_parser = subparsers.add_parser(
+        'build', help='Create and populate Chroma DB')
+
+    load_parser = subparsers.add_parser('load', help='Load Chroma DB')
+
+    retrieve_parser = subparsers.add_parser(
+        'retrieve', help='Retrieve documents based on query')
+    retrieve_parser.add_argument(
         'query', type=str, help='Query for document retrieval')
-    subparsers.add_parser('reupload', help='Reupload documents to Chroma')
-    subparsers.add_parser('clear', help='Clear Chroma DB')
-    subparsers.add_parser('destroy', help='Destroy Chroma DB')
+    retrieve_parser.add_argument(
+        '--top_n', type=int, default=5, help='Number of top documents to retrieve')
+    retrieve_parser.add_argument('--search_kwargs', type=int, default=20,
+                                 help='Number of search results to consider for reranking')
+    retrieve_parser.add_argument('--rerank', type=bool, default=False,
+                                 help='Whether to rerank the documents using a cross encoder')
+
+    clear_parser = subparsers.add_parser('clear', help='Clear Chroma DB')
+
+    destroy_parser = subparsers.add_parser('destroy', help='Destroy Chroma DB')
 
     args = parser.parse_args()
 
-    # Initialize ChromaEmbedding with or without OpenAI embeddings based on the command line argument
     chroma = ChromaEmbedding(use_openai=args.use_openai)
 
-    # Handle operations
-    if args.operation == 'retrieve':
-        print(chroma.get_similar_documents(args.query))
+    if args.operation == 'build':
+        chroma.create_and_populate_chroma()
+    elif args.operation == 'load':
+        chroma.load_chroma_db()
+    elif args.operation == 'retrieve':
+        docs = chroma.get_similar_documents(
+            args.query, top_n=args.top_n, search_kwargs=args.search_kwargs, rerank=args.rerank)
+        for doc in docs:
+            print(doc)
     elif args.operation == 'reupload':
         chroma.reupload_to_chroma()
     elif args.operation == 'clear':
