@@ -10,8 +10,11 @@ from langchain_openai import ChatOpenAI
 import shutil
 import sys
 import importlib
-from RAG.tree_builder import TreeBuilder
+from tree_builder import TreeBuilder
 from tqdm import tqdm
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import CrossEncoderReranker
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 
 
 def dynamic_import_embedding():
@@ -47,7 +50,9 @@ class RaptorEmbedding(Embedding):
         self,
         dataset_path="../RAG/datasets/",
         embedding_model="text-embedding-3-small",
-        llm_model="gpt-3.5-turbo-0125"
+        llm_model="gpt-3.5-turbo-0125",
+        level=1,
+        n_levels=3
     ):
 
         self.__open_key = os.getenv('OPENAI_API_KEY')
@@ -58,13 +63,13 @@ class RaptorEmbedding(Embedding):
         self.__persist_chroma_directory = 'collapsed_tree_db'
         self.__processed_articles_path = dataset_path + "xray_articles_processed.json"
         self.__articles_path = dataset_path + "xray_articles.json"
-        self.__process_json()  # Ensure this method is called before loading articles
-        self.__xray_articles = self.__load_xray_articles()
-        self.__xray_chunked_articles = self.__chunk_documents(
-            self.__xray_articles)
-        self.__results = self.__build_tree(level=1, n_levels=3)
         self.__tree_db = None
         if not os.path.isdir('./collapsed_tree_db'):
+            self.__process_json()
+            self.__xray_articles = self.__load_xray_articles()
+            self.__xray_chunked_articles = self.__chunk_documents(
+                self.__xray_articles)
+            self.__results = self.__build_tree(level=level, n_levels=n_levels)
             self.__collapse_tree(results=self.__results)
 
         self.load_tree_db()
@@ -74,12 +79,10 @@ class RaptorEmbedding(Embedding):
         with open(os.path.join(os.path.dirname(__file__), self.__articles_path), "r") as file:
             data = json.load(file)
 
-        # Process each document
         for doc in tqdm(data, desc="Processing JSON documents"):
             doc['Authors'] = ' , '.join(doc['Authors'])
             doc['FullText'] = ' , '.join(doc['FullText'])
 
-        # Save the processed JSON
         with open(os.path.join(os.path.dirname(__file__), self.__processed_articles_path), "w") as file:
             json.dump(data, file, indent=4)
 
@@ -129,6 +132,7 @@ class RaptorEmbedding(Embedding):
         vectorstore = Chroma.from_texts(
             texts=all_texts, embedding=self.__embedding_open, persist_directory=self.__persist_chroma_directory)
         self.__tree_db = vectorstore
+
         return
 
     def load_tree_db(self):
@@ -143,9 +147,23 @@ class RaptorEmbedding(Embedding):
 
             self.__tree_db = vector_db
 
-    def get_similar_documents(self, query_text):
-        docs = self.__tree_db.similarity_search(query_text)
-        return docs
+    def get_similar_documents(self, query_text, top_n=3, search_kwargs=20, rerank=True):
+        if rerank:
+            print("Reranking documents...")
+            return self.__rerank(query_text, top_n=top_n,
+                                 search_kwargs=search_kwargs)
+
+        return self.__tree_db.similarity_search(query_text)
+
+    def __rerank(self, prompt, top_n=3, search_kwargs=20):
+        model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
+        compressor = CrossEncoderReranker(model=model, top_n=top_n)
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=compressor, base_retriever=self.__tree_db.as_retriever(search_kwargs={"k": search_kwargs}))
+
+        compressed_docs = compression_retriever.invoke(prompt)
+
+        return compressed_docs
 
     def clear(self):
         ids_to_delete = []
@@ -156,42 +174,74 @@ class RaptorEmbedding(Embedding):
 
         self.__tree_db.delete(ids=ids_to_delete)
 
+    def destroy(self):
+        folder_path = 'collapsed_tree_db'
+        try:
+            shutil.rmtree(folder_path)
+            print("Chroma DB folder deleted successfully.")
+        except FileNotFoundError:
+            print("The folder does not exist.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Raptor Embedding Tool")
 
-    # Option to choose between OpenAI and HuggingFace embeddings
     parser.add_argument('--embedding_model', type=str,
                         default="text-embedding-3-small", help="OpenAI embedding model")
     parser.add_argument('--llm_model', type=str,
                         default="gpt-3.5-turbo-0125", help="OpenAI language model")
+    parser.add_argument('--dataset_path', type=str,
+                        default="../RAG/datasets/", help="Path to dataset")
 
-    # Commands for different operations
     subparsers = parser.add_subparsers(dest='operation', help='Operations')
 
-    # Add subparsers for each operation
-    subparsers.add_parser(
+    build_parser = subparsers.add_parser(
         'build', help='Create and populate the tree and collapse it into Chroma DB')
-    subparsers.add_parser(
+    build_parser.add_argument('--level', type=int, default=1,
+                              help='Starting level for building the tree')
+    build_parser.add_argument('--n_levels', type=int, default=3,
+                              help='Number of levels to build the tree')
+
+    load_parser = subparsers.add_parser(
         'load', help='Load the collapsed tree from Chroma DB')
-    subparsers.add_parser('retrieve', help='Retrieve documents based on query').add_argument(
-        'query', type=str, help='Query for document retrieval')
-    subparsers.add_parser('clear', help='Clear Chroma DB')
+
+    retrieve_parser = subparsers.add_parser(
+        'retrieve', help='Retrieve documents based on query')
+    retrieve_parser.add_argument('query', type=str,
+                                 help='Query for document retrieval')
+    retrieve_parser.add_argument('--top_n', type=int, default=3,
+                                 help='Number of top documents to retrieve')
+    retrieve_parser.add_argument('--search_kwargs', type=int, default=20,
+                                 help='Number of search results to consider for reranking')
+    retrieve_parser.add_argument('--rerank', type=bool, default=False,
+                                 help='Whether to rerank the documents using a cross encoder')
+
+    clear_parser = subparsers.add_parser(
+        'clear', help='Clear Chroma DB')
+
+    destroy_parser = subparsers.add_parser(
+        'destroy', help='Delete the Chroma DB folder')
 
     args = parser.parse_args()
 
-    # Initialize Raptor with or without OpenAI embeddings based on the command line argument
-    raptor = Raptor(embedding_model=args.embedding_model,
-                    llm_model=args.llm_model)
+    raptor = RaptorEmbedding(dataset_path=args.dataset_path,
+                             embedding_model=args.embedding_model,
+                             llm_model=args.llm_model)
 
-    # Handle operations
     if args.operation == 'build':
-        raptor.__build_tree()
+        raptor.__build_tree(level=args.level, n_levels=args.n_levels)
     elif args.operation == 'load':
         raptor.load_tree_db()
     elif args.operation == 'retrieve':
-        print(raptor.get_similar_documents(args.query))
+        docs = raptor.get_similar_documents(
+            query_text=args.query, top_n=args.top_n, search_kwargs=args.search_kwargs, rerank=args.rerank)
+        for doc in docs:
+            print(doc)
     elif args.operation == 'clear':
         raptor.clear()
+    elif args.operation == 'destroy':
+        raptor.destroy()
     else:
         parser.print_help()

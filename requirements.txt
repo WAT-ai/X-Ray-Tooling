@@ -42,11 +42,12 @@ jq==1.6.0
 jsonpatch==1.33
 jsonpointer==2.4
 kubernetes==29.0.0
-langchain==0.1.1
-langchain-community==0.0.13
-langchain-core==0.2.9
+langchain==0.2.6
+langchain-community==0.2.6
+langchain-core==0.2.11
 langchain-openai==0.1.9
-langsmith==0.1.81
+langchain-text-splitters==0.2.2
+langsmith==0.1.83
 llvmlite==0.43.0
 MarkupSafe==2.1.3
 marshmallow==3.20.2
