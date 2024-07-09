@@ -152,7 +152,7 @@ class ChromaEmbedding(Embedding):
 
             self.__chroma_db = vector_db
 
-    def get_similar_documents(self, query_text, top_n=3, search_kwargs=20, rerank=True) -> list[tuple[float, int, str]]:
+    def get_similar_documents(self, query_text, top_n=5, search_kwargs=20, rerank=True) -> list[tuple[float, int, str]]:
         """
         Retrieves documents from the Chroma database based on a given query.
 
@@ -170,7 +170,7 @@ class ChromaEmbedding(Embedding):
 
         return self.__chroma_db.similarity_search(query_text)
 
-    def __rerank(self, prompt, top_n=3, search_kwargs=20):
+    def __rerank(self, prompt, top_n=5, search_kwargs=20):
         model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
         compressor = CrossEncoderReranker(model=model, top_n=top_n)
         compression_retriever = ContextualCompressionRetriever(

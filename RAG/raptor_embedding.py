@@ -147,7 +147,7 @@ class RaptorEmbedding(Embedding):
 
             self.__tree_db = vector_db
 
-    def get_similar_documents(self, query_text, top_n=3, search_kwargs=20, rerank=True):
+    def get_similar_documents(self, query_text, top_n=5, search_kwargs=20, rerank=True):
         if rerank:
             print("Reranking documents...")
             return self.__rerank(query_text, top_n=top_n,
@@ -155,7 +155,7 @@ class RaptorEmbedding(Embedding):
 
         return self.__tree_db.similarity_search(query_text)
 
-    def __rerank(self, prompt, top_n=3, search_kwargs=20):
+    def __rerank(self, prompt, top_n=5, search_kwargs=20):
         model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
         compressor = CrossEncoderReranker(model=model, top_n=top_n)
         compression_retriever = ContextualCompressionRetriever(
@@ -211,7 +211,7 @@ if __name__ == "__main__":
         'retrieve', help='Retrieve documents based on query')
     retrieve_parser.add_argument('query', type=str,
                                  help='Query for document retrieval')
-    retrieve_parser.add_argument('--top_n', type=int, default=3,
+    retrieve_parser.add_argument('--top_n', type=int, default=5,
                                  help='Number of top documents to retrieve')
     retrieve_parser.add_argument('--search_kwargs', type=int, default=20,
                                  help='Number of search results to consider for reranking')
