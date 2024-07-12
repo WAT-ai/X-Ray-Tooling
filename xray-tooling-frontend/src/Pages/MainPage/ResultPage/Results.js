@@ -9,10 +9,12 @@ import {
 import classIdToBodyPart from './BodyPartMapping.json';
 import './Results.css';
 
-const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseTwoResult, setPhaseTwoResult }) => {
+const ResultPage = ({ image, imageURL, setStage, phaseOneResult, setPhaseOneResult, phaseTwoResult, setPhaseTwoResult }) => {
 
+  const [imgUrl, setUrl] = useState(null);
 
   const handleRunPhaseOne = async () => {
+    if (phaseOneResult) return;
     try {
       const response = await fetch('http://127.0.0.1:8000/phase1', {
         method: 'GET',
@@ -35,6 +37,7 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
   };
 
   const handleRunPhaseTwo = async () => {
+    if (phaseTwoResult) return;
     try {
       const response = await fetch('http://127.0.0.1:8000/phase2', {
         method: 'GET',
@@ -62,8 +65,9 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
     handleRunPhaseTwo();
   }, []);
 
+
   const handleSubmit = () => {
-    setStage('consultation')
+    setStage('Consultation')
   }
 
   const handlePhaseOneSelectChange = (event) => {
@@ -74,41 +78,49 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
     setPhaseTwoResult(event.target.value);
   };
 
-  console.log(image);
-  const url = URL.createObjectURL(image[0]);
-
   return (
     <div class="flex flex-col h-full">
-      <div class="flex-none flex items-end w-5/6 py-8 mt-8 mx-auto" style={{ height: "10%" }}>
+      {/* <div class="flex-none flex items-end w-5/6 py-8 mt-8 mx-auto" style={{ height: "10%" }}>
         <h1 class="text-4xl font-bold">2. Diagnosis </h1>
-      </div>
+      </div> */}
       <div class="flex flex-col items-start w-5/6 mx-auto h-full">
-        <div class="flex flex-row h-5/6 space-x-5">
-          
-          <div class="w-7/12 flex flex-grow flex-col space-y-5">
+        <div class="flex flex-row h-5/6 space-x-2">
+          <div class="w-7/12 flex flex-grow flex-col">
             <div class="flex flex-col items-start h-1/2 w-full border-solid border-2 border-blue-500 rounded-lg p-8">
-              <h1 class="text-3xl font-bold text-left"> Fracture Classification: {phaseOneResult ? phaseOneResult : 'Loading...'} </h1>
+              <h1 class="text-3xl font-bold text-left">
+                Fracture Classification:
+                <span class="ml-5 text-blue-600">
+                  {phaseOneResult ? phaseOneResult : 'Loading...'}
+                </span>
+              </h1>
               <h1 class="text-2xl pt-3 pb-3 text-left">If fractures are present, we suggest consulting your doctor or engaging our AI chatbot to inquire about the optimal steps to take.</h1>
-                <Select
-                  displayEmpty
-                  value={phaseOneResult ? phaseOneResult : ''}
-                  onChange={handlePhaseOneSelectChange}
-                  sx={{ minWidth: '100px', marginLeft: '0px' }}
-                  renderValue={(selected) => {
-                    if (selected === '') {
-                      return <em>Override</em>;
-                    }
-                    return selected;
-                  }}
-                >
-                  <MenuItem value="Fractured">Fractured</MenuItem>
-                  <MenuItem value="Not Fractured">Not Fractured</MenuItem>
-                </Select>
+              <Select
+                sx={{ border: 'none' }}
+                displayEmpty
+                value={phaseOneResult ? phaseOneResult : ''}
+                onChange={handlePhaseOneSelectChange}
+                renderValue={(selected) => {
+                  if (selected === '') {
+                    return <em>Override</em>;
+                  }
+                  return selected;
+                }}
+              >
+                <MenuItem value="Fractured">Fractured</MenuItem>
+                <MenuItem value="Not Fractured">Not Fractured</MenuItem>
+              </Select>
             </div>
+            <div class="h-4"></div> {/* Spacer div dont delete */}
+
             <div class="flex flex-col items-start h-1/2 w-full border-solid border-2 border-blue-500 rounded-lg p-8">
-              <h1 class="text-3xl font-bold text-left">Body Part Classification: {phaseTwoResult ? phaseTwoResult : 'Loading...'}</h1>
+              <h1 class="text-3xl font-bold text-left">
+                Fracture Location:
+                <span class="ml-5 text-blue-600">
+                  {phaseTwoResult ? phaseTwoResult : 'Loading...'}
+                </span>
+              </h1>
               <h1 class="text-2xl pt-3 pb-5 text-left">Specific bone fractures most likely require unique rehabilitation plans.</h1>
-              
+
               <Select
                 displayEmpty
                 value={phaseTwoResult ? phaseTwoResult : ''}
@@ -120,23 +132,29 @@ const ResultPage = ({ image, setStage, phaseOneResult, setPhaseOneResult, phaseT
                   }
                   return selected;
                 }}
-                >
-                  {Object.entries(classIdToBodyPart).map(([id, bodyPart]) => (
-                    <MenuItem key={id} value={bodyPart}>{bodyPart}</MenuItem>
+              >
+                {Object.entries(classIdToBodyPart).map(([id, bodyPart]) => (
+                  <MenuItem key={id} value={bodyPart}>{bodyPart}</MenuItem>
                 ))}
               </Select>
             </div>
           </div>
-          
-          <div class="w-5/12"> 
-            <img src={url} className="results-image" />
+          <div class="w-5/12">
+            <img src={imageURL} className="results-image" />
           </div>
-
         </div>
-        <button className="results-submit" onClick={handleSubmit}>Submit</button>
+        <div class="w-full h-1/6 flex justify-end items-end">
+                    {/* <button className="upload-submit" onClick={handleSubmit}>Submit</button> */}
+                    <div onClick={handleSubmit} class="group flex w-1/6 mb-6 cursor-pointer items-center justify-center rounded-md bg-progress-green px-6 py-2 text-white hover:bg-hover-green">
+                        <span class="group flex w-full items-center justify-center rounded py-1 text-center font-bold"> Continue </span>
+                        <svg class="flex-0 ml-4 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </div>
+                </div>
 
       </div>
-    
+
     </div>
 
   );

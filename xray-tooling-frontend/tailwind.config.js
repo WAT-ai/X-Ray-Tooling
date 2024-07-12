@@ -21,6 +21,9 @@ module.exports = {
         'theme-blue-light': 'rgb(44, 113, 217)',
         'theme-blue-dark': '#25559D',
         'response-grey': '#EEEEEE',
+        'dark-grey': '#AAAAAA',
+        'progress-green': 'rgb(75, 181, 67)',
+        'hover-green': '#3c9035'
       },
       animation: {
         'slide-in': 'slide-in 0.5s forwards',

@@ -4,6 +4,10 @@ import SideBar from '../../../Components/SideBar';
 import Stack from '@mui/material/Stack';
 import RequestResponse from '../../../Components/RequestResponse';
 import QueryRequest from '../../../Components/QueryRequest'
+import HeatIceIcon from '../../../Assets/Icons/HeatIceIcon.svg';
+import ExpectationIcon from '../../../Assets/Icons/ExpectationIcon.svg';
+import RestrictionIcon from '../../../Assets/Icons/RestrictionIcon.svg';
+import BaseIcon from '../../../Assets/Icons/BaseIcon.svg';
 
 
 const RagPage = ({ request, injury, injuryLocation }) => {
@@ -122,6 +126,7 @@ const RagPage = ({ request, injury, injuryLocation }) => {
 
             const newMessage = { text: input, sender: "user" };
             const ctrl = new AbortController();
+            setRequestStack(prevStack => [...prevStack, { request: { query: input, requestType: 'query' }, response: '' }]);
 
             try {
                 await fetchEventSource('http://127.0.0.1:8000/rag/query/stream', {
@@ -157,6 +162,13 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                         try {
                             const d = data;
                             setQueryResponse(prevResponse => prevResponse + ' ' + d)
+                            setRequestStack(prevStack => {
+                                // Update the response of the last object
+                                const lastObjectIndex = prevStack.length - 1;
+                                return prevStack.map((item, i) =>
+                                    i === lastObjectIndex ? { ...item, response: item.response + ' ' + data } : item
+                                );
+                            });
                         } catch (e) {
                             console.log('Fetch onmessage error', e);
                         }
@@ -172,24 +184,49 @@ const RagPage = ({ request, injury, injuryLocation }) => {
         setRequestStack(prevStack => prevStack.filter((_, index) => index !== indexToRemove));
     }
 
+    const sideBarItems = [
+        { symbol: BaseIcon, text: 'Base', value: 'base', text: 'General diagnosis of injury' },
+        { symbol: HeatIceIcon, text: 'Heat and Ice', value: 'heat_ice', text: 'Best practices for heating and icing' },
+        { symbol: ExpectationIcon, text: 'Expectation', value: 'expectation', text: "What to expect with your injury" },
+        { symbol: RestrictionIcon, text: 'Restriction', value: 'restriction', text: "What to avoid with your injury" },
+    ]
+
+    const handleItemClick = (item) => {
+        setRequestStack(prevStack => [
+            { request: { flow: item.value, requestType: 'flow' }, response: flowResponse[item.value].data, status: flowResponse[item.value].status },
+            ...prevStack
+        ]);
+    }
+
     return (
-        <div class="h-full flex flex-row justify-start">
-            <div class='w-1/6 h-full'>
+        <div class="h-full flex flex-row justify-center mt-5">
+            {/* <div class='w-1/6 h-full'>
                 <SideBar requestStack={requestStack} setRequestStack={setRequestStack} flowResponse={flowResponse} />
-            </div>
+            </div> */}
 
             <div class="w-4/6 h-full flex justify-center">
-                <Stack spacing={2} class="w-5/6">
+                <Stack spacing={4} class="w-5/6">
+                    <QueryRequest sendQuery={sendQuery} />
+                    <div class="grid grid-cols-2 gap-2 w-full mt-2 mb-10">
+                        {sideBarItems.map((item, index) => (
+                            <div key={index} class="relative h-[62px] flex items-center  block w-full ps-10 text-lg text-white border border-gray-600 rounded-lg bg-gray-600	 hover:bg-gray-700 hover:border-blue-500 select-none" onClick={() => handleItemClick(item)}>
+                                <div class="absolute start-0 ps-3 flex items-center ">
+                                    <img src={item.symbol} />
+                                </div>
+                                <h1 class="text-left ml-3 text-gray-100">{item.text}</h1>
+                            </div>
+                        ))}
+                    </div>
                     {requestStack.map((queryObject, index) => (
                         <div>
                             <RequestResponse queryObject={queryObject} removeRequest={removeRequestFromStack} index={index} />
                         </div>
                     ))}
-                    <QueryRequest />
+
+
                 </Stack>
             </div>
 
-            
 
         </div>
     );
