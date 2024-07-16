@@ -195,8 +195,8 @@ const RagPage = ({ setStage, injury, injuryLocation }) => {
     return (
         <div class="h-full flex flex-row justify-center mt-5">
             <div class="">
-                <div class="group flex w-26 mb-6 cursor-pointer items-center justify-center rounded-md bg-progress-green px-6 py-2 text-white hover:bg-hover-green">
-                    <span onClick={handleBack} class="group flex w-full items-center justify-center rounded py-1 text-center font-bold"> Back </span>
+                <div onClick={handleBack} class="group flex w-26 mb-6 cursor-pointer items-center justify-center rounded-md bg-progress-green px-6 py-2 text-white hover:bg-hover-green">
+                    <span class="group flex w-full items-center justify-center rounded py-1 text-center font-bold"> Back </span>
                     <svg class="flex-0 ml-4 h-6 w-6 transform rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
