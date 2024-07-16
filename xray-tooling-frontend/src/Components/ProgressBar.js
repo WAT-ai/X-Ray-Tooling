@@ -181,7 +181,7 @@ const ProgressBar = ({ stage }) => {
         //         <div className="step-name">Consultation</div>
         //     </div>
         // </div>
-        <div class="w-full my-4 ">
+        <div class="w-full my-4 h-[98px]">
             <Stepper alternativeLabel activeStep={activeStepIndex} connector={<ColorlibConnector />}>
                 {steps.map((label) => (
                     <Step key={label.step}>

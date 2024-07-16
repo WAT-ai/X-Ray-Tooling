@@ -8,6 +8,7 @@ const QueryRequest = ({ sendQuery }) => {
 
     const handleSearchClick = () => {
         sendQuery(query);
+        setQuery("");
     };
 
 

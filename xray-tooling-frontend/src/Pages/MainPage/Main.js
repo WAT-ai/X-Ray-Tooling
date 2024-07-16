@@ -23,12 +23,12 @@ const Main = () => {
     const nodeRef = stage === "upload" ? uploadRef : stage === "results" ? resultsRef : consultationRef;
 
     useEffect(() => {
-        if(image){
+        if (image) {
             console.log(image);
             const url = URL.createObjectURL(image[0]);
             setImageURL(url)
         }
-    },[image])
+    }, [image])
 
     const RenderStage = () => {
         return (
@@ -40,13 +40,13 @@ const Main = () => {
                     classNames='fade'
                     addEndListener={(done) => {
                         nodeRef.current.addEventListener("transitionend", done, false);
-                      }}
+                    }}
                 >
                     <div ref={nodeRef} class="h-full">
                         {stage === 'upload' && <UploadPage setStage={setStage} image={image} setImage={setImage} />}
-                        {stage === 'results' && <ResultPage setStage={setStage} image={image} imageURL={imageURL} setPhaseOneResult={setPhaseOneResult} phaseOneResult={phaseOneResult} setPhaseTwoResult={setPhaseTwoResult} phaseTwoResult={phaseTwoResult}/>}
-                        {stage === 'consultation' && <ConsultationPage setStage={setStage} image={image} setRequest={setRequest} phaseOneResult={phaseOneResult} phaseTwoResult={phaseTwoResult}/>}
-                        {stage === 'RAG' && <RagPage setStage={setStage} request={request} injury={phaseOneResult} injuryLocation={phaseTwoResult}/>}
+                        {stage === 'results' && <ResultPage setStage={setStage} image={image} imageURL={imageURL} setPhaseOneResult={setPhaseOneResult} phaseOneResult={phaseOneResult} setPhaseTwoResult={setPhaseTwoResult} phaseTwoResult={phaseTwoResult} />}
+                        {/* {stage === 'consultation' && <ConsultationPage setStage={setStage} image={image} setRequest={setRequest} phaseOneResult={phaseOneResult} phaseTwoResult={phaseTwoResult}/>} */}
+                        {stage === 'consultation' && <RagPage setStage={setStage} request={request} injury={phaseOneResult} injuryLocation={phaseTwoResult} />}
                     </div>
                 </CSSTransition>
             </SwitchTransition>
@@ -54,10 +54,12 @@ const Main = () => {
     };
 
     return (
-        <div style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
-            <NavBar />
+        <div class="h-screen w-full flex flex-col">
+            <NavBar /> 
             <ProgressBar stage={stage} />
-            <RenderStage />
+            <div class="flex-grow overflow-auto">
+                <RenderStage />
+            </div>
         </div>
     );
 };

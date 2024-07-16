@@ -10,7 +10,7 @@ import RestrictionIcon from '../../../Assets/Icons/RestrictionIcon.svg';
 import BaseIcon from '../../../Assets/Icons/BaseIcon.svg';
 
 
-const RagPage = ({ request, injury, injuryLocation }) => {
+const RagPage = ({ setStage, injury, injuryLocation }) => {
 
     const [requestStack, setRequestStack] = useState([]);
     const [flowResponse, setFlowResponse] = useState({
@@ -19,15 +19,11 @@ const RagPage = ({ request, injury, injuryLocation }) => {
         'expectation': { data: '', docs: '', status: '' },
         'restriction': { data: '', docs: '', status: '' },
     });
-    const [queryResponse, setQueryResponse] = useState('');
     const hasSentQuery = useRef(false);
     const model = 'openai'
 
     useEffect(() => {
         if (!hasSentQuery.current) {
-            if (request.requestType === 'query') {
-                sendQuery(request.message)
-            }
             sendAllFlowQuery();
             hasSentQuery.current = true;
         }
@@ -44,6 +40,7 @@ const RagPage = ({ request, injury, injuryLocation }) => {
         if (injury.trim() == "" || injuryLocation.trim() == "") return;
 
         const ctrl = new AbortController();
+        console.log(flow)
 
         try {
             await fetchEventSource(`http://127.0.0.1:8000/rag/flow/stream/${flow}`, {
@@ -98,19 +95,6 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                                 status: 'open'
                             }
                         }));
-                        if (flow === request.flow) {
-                            setRequestStack(prevStack => {
-                                if (prevStack.length === 0) {
-                                    // If the stack is empty, add a new object
-                                    return [{ request: { flow: flow, requestType: request.requestType }, response: data, status: 'open' }];
-                                } else {
-                                    // If the stack is not empty, update the data of the first object
-                                    return prevStack.map((item, index) =>
-                                        index === 0 ? { ...item, response: item.response + ' ' + data, status: 'open' } : item
-                                    );
-                                }
-                            });
-                        }
                     } catch (e) {
                         console.log('Fetch onmessage error', e);
                     }
@@ -126,8 +110,7 @@ const RagPage = ({ request, injury, injuryLocation }) => {
 
             const newMessage = { text: input, sender: "user" };
             const ctrl = new AbortController();
-            setRequestStack(prevStack => [...prevStack, { request: { query: input, requestType: 'query' }, response: '' }]);
-
+            setRequestStack(prevStack => [{ request: { query: input, requestType: 'query' }, response: '' }, ...prevStack]);
             try {
                 await fetchEventSource('http://127.0.0.1:8000/rag/query/stream', {
                     method: 'POST',
@@ -161,18 +144,16 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                         }
                         try {
                             const d = data;
-                            setQueryResponse(prevResponse => prevResponse + ' ' + d)
                             setRequestStack(prevStack => {
-                                // Update the response of the last object
-                                const lastObjectIndex = prevStack.length - 1;
-                                return prevStack.map((item, i) =>
-                                    i === lastObjectIndex ? { ...item, response: item.response + ' ' + data } : item
+                                return prevStack.map((item) =>
+                                    item.request.query === input ? { ...item, response: item.response + ' ' + data } : item
                                 );
                             });
                         } catch (e) {
                             console.log('Fetch onmessage error', e);
                         }
                     },
+
                 })
             } catch (e) {
                 console.log('Error', e);
@@ -182,6 +163,7 @@ const RagPage = ({ request, injury, injuryLocation }) => {
 
     const removeRequestFromStack = (indexToRemove) => {
         setRequestStack(prevStack => prevStack.filter((_, index) => index !== indexToRemove));
+
     }
 
     const sideBarItems = [
@@ -192,24 +174,42 @@ const RagPage = ({ request, injury, injuryLocation }) => {
     ]
 
     const handleItemClick = (item) => {
-        setRequestStack(prevStack => [
-            { request: { flow: item.value, requestType: 'flow' }, response: flowResponse[item.value].data, status: flowResponse[item.value].status },
-            ...prevStack
-        ]);
+        setRequestStack(prevStack => {
+            const itemIndex = prevStack.findIndex(stackItem => stackItem.request.flow === item.value);
+
+            if (itemIndex !== -1) {
+                prevStack.splice(itemIndex, 1);
+            }
+
+            return [
+                { request: { flow: item.value, requestType: 'flow' }, status: flowResponse[item.value].status },
+                ...prevStack
+            ];
+        });
+    }
+
+    const handleBack = () => {
+        setStage('results')
     }
 
     return (
         <div class="h-full flex flex-row justify-center mt-5">
-            {/* <div class='w-1/6 h-full'>
-                <SideBar requestStack={requestStack} setRequestStack={setRequestStack} flowResponse={flowResponse} />
-            </div> */}
-
+            <div class="">
+                <div class="group flex w-26 mb-6 cursor-pointer items-center justify-center rounded-md bg-progress-green px-6 py-2 text-white hover:bg-hover-green">
+                    <span onClick={handleBack} class="group flex w-full items-center justify-center rounded py-1 text-center font-bold"> Back </span>
+                    <svg class="flex-0 ml-4 h-6 w-6 transform rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </div>
+            </div>
             <div class="w-4/6 h-full flex justify-center">
+
                 <Stack spacing={4} class="w-5/6">
+
                     <QueryRequest sendQuery={sendQuery} />
                     <div class="grid grid-cols-2 gap-2 w-full mt-2 mb-10">
                         {sideBarItems.map((item, index) => (
-                            <div key={index} class="relative h-[62px] flex items-center  block w-full ps-10 text-lg text-white border border-gray-600 rounded-lg bg-gray-600	 hover:bg-gray-700 hover:border-blue-500 select-none" onClick={() => handleItemClick(item)}>
+                            <div key={index} class="relative h-[62px] flex items-center  block w-full ps-10 text-lg text-white border border-gray-600 rounded-lg bg-gray-600	 hover:bg-gray-700 hover:border-blue-500 select-none cursor-pointer" onClick={() => handleItemClick(item)}>
                                 <div class="absolute start-0 ps-3 flex items-center ">
                                     <img src={item.symbol} />
                                 </div>
@@ -219,13 +219,14 @@ const RagPage = ({ request, injury, injuryLocation }) => {
                     </div>
                     {requestStack.map((queryObject, index) => (
                         <div>
-                            <RequestResponse queryObject={queryObject} removeRequest={removeRequestFromStack} index={index} />
+                            <RequestResponse queryObject={queryObject} flowResponse={flowResponse} removeRequest={removeRequestFromStack} index={index} />
                         </div>
                     ))}
 
 
                 </Stack>
             </div>
+
 
 
         </div>

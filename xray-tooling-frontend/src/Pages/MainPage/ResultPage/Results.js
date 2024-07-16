@@ -67,7 +67,11 @@ const ResultPage = ({ image, imageURL, setStage, phaseOneResult, setPhaseOneResu
 
 
   const handleSubmit = () => {
-    setStage('Consultation')
+    setStage('consultation')
+  }
+
+  const handleBack = () => {
+    setStage('upload')
   }
 
   const handlePhaseOneSelectChange = (event) => {
@@ -79,11 +83,7 @@ const ResultPage = ({ image, imageURL, setStage, phaseOneResult, setPhaseOneResu
   };
 
   return (
-    <div class="flex flex-col h-full">
-      {/* <div class="flex-none flex items-end w-5/6 py-8 mt-8 mx-auto" style={{ height: "10%" }}>
-        <h1 class="text-4xl font-bold">2. Diagnosis </h1>
-      </div> */}
-      <div class="flex flex-col items-start w-5/6 mx-auto h-full">
+    <div class="flex flex-col items-start w-5/6 mx-auto h-full">
         <div class="flex flex-row h-5/6 space-x-2">
           <div class="w-7/12 flex flex-grow flex-col">
             <div class="flex flex-col items-start h-1/2 w-full border-solid border-2 border-blue-500 rounded-lg p-8">
@@ -143,20 +143,22 @@ const ResultPage = ({ image, imageURL, setStage, phaseOneResult, setPhaseOneResu
             <img src={imageURL} className="results-image" />
           </div>
         </div>
-        <div class="w-full h-1/6 flex justify-end items-end">
-                    {/* <button className="upload-submit" onClick={handleSubmit}>Submit</button> */}
-                    <div onClick={handleSubmit} class="group flex w-1/6 mb-6 cursor-pointer items-center justify-center rounded-md bg-progress-green px-6 py-2 text-white hover:bg-hover-green">
-                        <span class="group flex w-full items-center justify-center rounded py-1 text-center font-bold"> Continue </span>
-                        <svg class="flex-0 ml-4 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </div>
-                </div>
-
-      </div>
-
+        <div class="w-full h-1/6 flex justify-between items-end">
+          {/* <button className="upload-submit" onClick={handleSubmit}>Submit</button> */}
+          <div onClick={handleBack} class="group flex w-26 mb-6 cursor-pointer items-center justify-center rounded-md bg-progress-green px-6 py-2 text-white hover:bg-hover-green">
+            <span class="group flex w-full items-center justify-center rounded py-1 text-center font-bold"> Back </span>
+            <svg class="flex-0 ml-4 h-6 w-6 transform rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+          <div onClick={handleSubmit} class="group flex w-48 mb-6 cursor-pointer items-center justify-center rounded-md bg-progress-green px-6 py-2 text-white hover:bg-hover-green">
+            <span class="group flex w-full items-center justify-center rounded py-1 text-center font-bold"> Continue </span>
+            <svg class="flex-0 ml-4 h-6 w-6 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </div>
+        </div>
     </div>
-
   );
 };
 
