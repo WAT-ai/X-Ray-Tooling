@@ -15,12 +15,16 @@ const NavBar = () => {
         navigate('/Main')
     }
 
+    const handleHowItWorks = () => {
+        navigate("/", { state: { targetId: "how-it-works-section" } }); // Replace 'HowItWorks' and 'specific-point' with your actual page path and element id
+    }
+
     return (
         <AppBar sx={{ position: "sticky", backgroundColor: 'white', height: '60px', width: '100%', borderBottom: 'none', boxShadow: 'none', boxSizing: 'border-box' }}>
             <Toolbar variant="dense" sx={{ justifyContent: 'space-between', borderBottom: 'none', height: '100%', width: '100%', paddingLeft: '25px', paddingRight: '25px', boxSizing: 'border-box' }}>
                 <img src={Logo} class="h-1/2" alt="Logo" />  
                 <div>
-                    <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }}>How it works</Button>
+                    <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }} onClick={handleHowItWorks}>How it works</Button>
                     <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }} onClick={handleBeginConsultation}>Consultation</Button>
                 </div>
                 <button class="text-black">Log In</button>

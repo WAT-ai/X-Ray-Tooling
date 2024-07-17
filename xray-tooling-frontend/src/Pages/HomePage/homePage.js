@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Typewriter from 'typewriter-effect';
 import SearchSharpIcon from '@mui/icons-material/SearchSharp';
@@ -25,11 +26,20 @@ const HomePage = () => {
   const fileInputRef = useRef(null);
   let navigate = useNavigate();
 
+  const {state} = useLocation();
+  const { targetId } = state || {};
+
+  useEffect(() => {
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.scrollIntoView();
+    }
+  }, [targetId]);
+
   let headers = new Headers();
   headers.append('Access-Control-Allow-Origin', 'http://127.0.0.1:8000/upload');
   headers.append('Access-Control-Allow-Credentials', 'true');
   headers.append('GET', 'POST', 'OPTIONS');
-
 
   const handleLogin = () => {
     navigate('/Login');
@@ -92,7 +102,7 @@ const HomePage = () => {
           </button>
         </div>
       </div>
-      <div class="w-full h-auto grid grid-cols-1 md:grid-cols-2 items-start">
+      <div id="how-it-works-section" class="w-full h-auto grid grid-cols-1 md:grid-cols-2 items-start">
         <div class="w-full flex justify-end items-center my-20">
           <div class=" h-2/3 w-3/4 mr-20">
             <div class="flex flex-col">
