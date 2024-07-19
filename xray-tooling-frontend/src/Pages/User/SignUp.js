@@ -138,17 +138,19 @@ const SignUp = () => {
                 aria-describedby="alert-dialog-description"
                 class="rounded-lg"
             >
-                <div class="h-[450px] w-[400px] flex flex-col items-center rounded-lg">
-                    <div class="w-full font-bold mt-20 ">
-                        <DialogTitle class="text-center text-lg text-green-600" id="alert-dialog-title">{"Thanks! Your account has been succesfully added to the wait list"}</DialogTitle>
+                <div class="h-[450px] w-auto flex flex-col items-center rounded-lg">
+                    <div class="w-full font-bold mt-20">
+                        <DialogTitle class="text-center text-lg text-green-600 mx-2" id="alert-dialog-title">{"Thanks! Your account has been succesfully added to the wait list"}</DialogTitle>
                     </div>
+                    <div class="mx-2 w-full">
                     <DialogContent>
                         <DialogContentText class="text-center text-black" id="alert-dialog-description">
                             We will email you when our product goes live. We are working hard on delivering as soon as possible. Please check your inbox for future updates.
                         </DialogContentText>
                     </DialogContent>
+                    </div>
                     <DialogActions>
-                        <button onClick={handleCloseDialog} type="button" class={`w-full px-6 py-3.5 mb-20 text-base font-bold text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-center`}>Ok</button>
+                        <button onClick={handleCloseDialog} type="button" class={`w-full mx-2 px-6 py-3.5 mb-20 text-base font-bold text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-center`}>Ok</button>
                     </DialogActions>
                 </div>
             </Dialog>

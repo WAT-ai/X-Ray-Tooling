@@ -49,7 +49,7 @@ const NavBar = () => {
                     <>
                         <img src={Logo} class="h-1/2" alt="Logo" />
                         <div>
-                            <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }}>How it works</Button>
+                            <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }} onClick={handleSignUp}>How it works</Button>
                             <Button color="inherit" sx={{ marginRight: '20px', color: 'black' }} onClick={handleSignUp}>Consultation</Button>
                         </div>
                         <button onClick={handleSignUp} class="text-black">Sign Up</button>
