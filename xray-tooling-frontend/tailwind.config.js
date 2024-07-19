@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'breakpoint-1000': '1000px'
+      },
       backgroundImage: theme => ({
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-linear': 'linear-gradient(var(--tw-gradient-stops))',
@@ -25,6 +28,7 @@ module.exports = {
         'dark-grey': '#AAAAAA',
         'progress-green': 'rgb(75, 181, 67)',
         'hover-green': '#3c9035',
+        'footer-grey': 'rgb(229, 231, 235)',
       },
       animation: {
         'slide-in': 'slide-in 0.5s forwards',

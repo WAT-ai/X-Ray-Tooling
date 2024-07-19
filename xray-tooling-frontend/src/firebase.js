@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getStorage } from "firebase/storage"
+import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -9,17 +9,18 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAzhMB6FedaG2lyE2NswfqJEW_1QIbolRU",
-  authDomain: "xray-tooling.firebaseapp.com",
-  projectId: "xray-tooling",
-  storageBucket: "xray-tooling.appspot.com",
-  messagingSenderId: "1011759391447",
-  appId: "1:1011759391447:web:82c4f3ca89f92a2f3a4692",
-  measurementId: "G-02K2S331YM"
+  apiKey: "AIzaSyDZk1Bq00SJYYnDn2U4-0cs5CGAkV6aVms",
+  authDomain: "x-care-b6602.firebaseapp.com",
+  databaseURL: "https://x-care-b6602-default-rtdb.firebaseio.com",
+  projectId: "x-care-b6602",
+  storageBucket: "x-care-b6602.appspot.com",
+  messagingSenderId: "482223657503",
+  appId: "1:482223657503:web:3a66b062e4f07c1fe27b2a",
+  measurementId: "G-SF6BNTWELP"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 export const auth = getAuth(app);
-export const storage = getStorage(app);
+export const database = getDatabase(app);

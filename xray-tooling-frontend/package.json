@@ -12,7 +12,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "evergreen-ui": "^7.1.9",
-    "firebase": "^10.6.0",
+    "firebase": "^10.12.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-easy-crop": "^5.0.5",
