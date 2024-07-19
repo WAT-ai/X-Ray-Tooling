@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@mui/material';
 import Typewriter from 'typewriter-effect';
@@ -19,15 +19,45 @@ import diagnosisDemo from '../../Assets/diagnosisDemo.svg'
 import consultDemo from '../../Assets/consultDemo.svg'
 import Footer from '../../Components/Footer';
 import NavBar from '../../Components/NavBar';
+import Loading from '../../Components/Loading';
 
 const HomePage = () => {
   const isMobile = useMediaQuery('(max-width:600px)');
   let navigate = useNavigate();
+  const [loading, setLoading] = useState(true)
+  const svgs = [DoctorImage, photoCollage, diagnosisDemo, consultDemo];
+
 
   let headers = new Headers();
   headers.append('Access-Control-Allow-Origin', 'http://127.0.0.1:8000/upload');
   headers.append('Access-Control-Allow-Credentials', 'true');
   headers.append('GET', 'POST', 'OPTIONS');
+
+
+  useEffect(() => {
+    Promise.all(
+      svgs.map(svg => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = svg;
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+      })
+    )
+      .then(() => setLoading(false))
+      .catch(err => console.error("Failed to load SVGs: ", err));
+  }, []);
+
+  if (loading) {
+    return (
+      <div class="h-screen w-screen flex justify-center items-center">
+        <Loading />
+      </div>
+    )
+  }
+
+
 
 
   const handleSignUp = () => {

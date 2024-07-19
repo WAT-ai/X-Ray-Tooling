@@ -140,7 +140,7 @@ const SignUp = () => {
             >
                 <div class="h-[450px] w-auto flex flex-col items-center rounded-lg">
                     <div class="w-full font-bold mt-20">
-                        <DialogTitle class="text-center text-lg text-green-600 mx-2" id="alert-dialog-title">{"Thanks! Your account has been succesfully added to the wait list"}</DialogTitle>
+                        <DialogTitle class="text-center text-lg text-green-600" id="alert-dialog-title">{"Thanks! Your account has been succesfully added to the wait list"}</DialogTitle>
                     </div>
                     <div class="mx-2 w-full">
                     <DialogContent>
