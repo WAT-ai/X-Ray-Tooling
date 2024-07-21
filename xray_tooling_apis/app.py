@@ -30,7 +30,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 def modify_model(model, dropout_rate, num_classes=2):
     if hasattr(model, 'fc'):
         num_ftrs = model.fc.in_features
@@ -148,6 +147,8 @@ models = {"cohere": chat_cohere, "openai": chat_openai}
 
 class Query(BaseModel):
     text: str
+    injury: str
+    injury_location: str
     model: str
 
 
@@ -155,14 +156,22 @@ class Query(BaseModel):
 async def rag_query(query: Query):
     # return run_similarity_search(qu)
 
-    text = query.text
+    text = f"Injury: {query.injury} Injury Location: {query.injury_location}. {query.text}"
+
 
     if query.model not in models:
         return {"error": "model not found."}
 
+
     model = models[query.model]
     return {"query": text, "response": model.query(text)}
 
+
+import uuid
+
+@app.get("/create/uuid4")
+async def generate_uuid4():
+    return uuid.uuid4()
 
 @app.post("/rag/query/stream")
 async def rag_query_steam(query: Query):
@@ -190,10 +199,14 @@ async def rag_flow(flow_query: FlowQuery):
     if flow_query.model not in models:
         return {"error": "model not found."}
 
+
     flow = FlowType(flow_query.flow)
     model = models[flow_query.model]
 
-    return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "flow": flow.value, "response": model.flow_query(flow_query.injury, flow_query.injury_location, flow)}
+    response = model.flow_query(flow_query.injury, flow_query.injury_location, flow)
+
+
+    return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "flow": flow.value, "response": response}
 
 
 class MultiFlowQuery(BaseModel):
