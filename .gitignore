@@ -2,9 +2,12 @@
 venv
 .pkl
 db
+collapsed_tree_db
+RAG_db
 
 *__pycache__
 
+.DS_Store
 
 # latex
 *.aux

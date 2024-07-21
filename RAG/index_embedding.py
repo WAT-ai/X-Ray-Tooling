@@ -43,7 +43,7 @@ class IndexEmbedding(Embedding):
             self,
             use_openai=False,
             num_matches=5,
-            dataset_path="RAG/datasets/",
+            dataset_path="../RAG/datasets/",
             chunking_max_tokens=100
     ) -> None:
         """

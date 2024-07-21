@@ -185,41 +185,41 @@ const ChatScreen = () => {
   };
 
   const sendFlowQuery = async (flow) => {
-    if (injury.trim() == "" || injuryLocation.trim() == "") return;
+      if (injury.trim() == "" || injuryLocation.trim() == "") return;
 
-    try {
-      // set loading
-      setFlowMessage("Loading...");
-      const response = await fetch("http://127.0.0.1:8000/rag/flow", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          injury: injury,
-          injury_location: injuryLocation,
-          flow: flow,
-          model: model,
-        }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("RAG run:", data);
-        setData(data);
-        console.log(flow);
-        setFlowData((prevFlowData) => ({
-          ...prevFlowData,
-          [flow]: data.response[0].content,
-        }));
-        setFlowDocs((prevFlowDocs) => ({
-          ...prevFlowDocs,
-          [flow]: data.response[1].map((doc) => doc.page_content),
-        }));
-        console.log(flowData);
+      try {
+        // set loading
+        setFlowMessage("Loading...");
+        const response = await fetch("http://127.0.0.1:8000/rag/flow", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            injury: injury,
+            injury_location: injuryLocation,
+            flow: flow,
+            model: model,
+          }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log("RAG run:", data);
+          setData(data);
+          console.log(flow);
+          setFlowData((prevFlowData) => ({
+            ...prevFlowData,
+            [flow]: data.response[0].content,
+          }));
+          setFlowDocs((prevFlowDocs) => ({
+            ...prevFlowDocs,
+            [flow]: data.response[1].map((doc) => doc.page_content),
+          }));
+          console.log(flowData);
+        }
+      } catch (error) {
+        console.error("Error running RAG:", error);
       }
-    } catch (error) {
-      console.error("Error running RAG:", error);
-    }
   }
 
 
