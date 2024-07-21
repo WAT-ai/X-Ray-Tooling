@@ -1,8 +1,8 @@
-PWD /Users/hargunmujral/Desktop/Repos/X-Ray-Tooling/report_documents
+PWD /Users/alialh/Documents/Programming/WatAI/X-Ray-Tooling/report_documents
 INPUT /usr/local/texlive/2023/texmf.cnf
 INPUT /usr/local/texlive/2023/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/hargunmujral/Desktop/Repos/X-Ray-Tooling/report_documents/CUCAI_paper.tex
+INPUT /Users/alialh/Documents/Programming/WatAI/X-Ray-Tooling/report_documents/CUCAI_paper.tex
 OUTPUT CUCAI_paper.log
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/ieeetran/IEEEtran.cls
 INPUT /usr/local/texlive/2023/texmf-dist/tex/latex/ieeetran/IEEEtran.cls

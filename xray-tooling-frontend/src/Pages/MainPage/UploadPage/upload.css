@@ -1,0 +1,81 @@
+.upload-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.upload-parent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.file-upload-container {
+    display: flex;
+    flex-direction: column;
+    height: 50vh;
+    width: 60vw;
+}
+
+.label-description {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    height: 4vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.file-upload {
+    height: 40vh;
+    width: 60vw;
+}
+
+.file-card{
+    height: 40vh;
+    width: 60vw
+}
+
+.upload-title-container {
+    width: 80%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+}
+
+
+.upload-submit {
+    align-items: center;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: transparent 0 0 0 3px, rgba(18, 18, 18, .1) 0 6px 20px;
+    box-sizing: border-box;
+    color: #121212;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: Inter, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    justify-content: center;
+    line-height: 1;
+    outline: none;
+    padding: 1rem 1.2rem;
+    text-align: center;
+    text-decoration: none;
+    transition: box-shadow .2s, -webkit-box-shadow .2s;
+    white-space: nowrap;
+    border: 1px solid #cccccc;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.upload-submit:hover {
+    box-shadow: #121212 0 0 0 3px, transparent 0 0 0 0;
+}
+

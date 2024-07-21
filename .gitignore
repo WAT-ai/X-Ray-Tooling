@@ -18,3 +18,5 @@ RAG_db
 *.fdb_latexmk
 *.out
 *.synctex.gz
+
+CV-research/Datasets

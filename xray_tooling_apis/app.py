@@ -1,11 +1,10 @@
 from RAG.flows import FlowType
-from RAG.chat import Chat
+from RAG.chat import Chat 
+#if getting a RAG module not found run: export PYTHONPATH="${PYTHONPATH}:path/to/xray-tooling-directory"
 from pydantic import BaseModel
-import json
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-
 import torch
 import shutil
 from torchvision.io import read_image
@@ -30,7 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 def modify_model(model, dropout_rate, num_classes=2):
     if hasattr(model, 'fc'):
@@ -89,11 +87,12 @@ phase2_model.eval()
 async def upload_file(file: UploadFile = File(...)):
     global file_location
     contents = await file.read()
+    print(contents)
     image_map = {"image/jpeg": ".jpg", "image/png": ".png",
                  "image/bmp": ".bmp", "image/gif": ".gif"}
     file_location = os.path.join(os.path.dirname(
         __file__), "../assets/", "1" + image_map[file.content_type])
-    print(file_location, "file_location")
+    ##print(file_location, "file_location")
     with open(file_location, "wb+") as file_object:
         file_object.write(contents)
     return {"info": f"file '{file.filename}' saved at '{file_location}'"}
@@ -148,6 +147,8 @@ models = {"cohere": chat_cohere, "openai": chat_openai}
 
 class Query(BaseModel):
     text: str
+    injury: str
+    injury_location: str
     model: str
 
 
@@ -155,14 +156,22 @@ class Query(BaseModel):
 async def rag_query(query: Query):
     # return run_similarity_search(qu)
 
-    text = query.text
+    text = f"Injury: {query.injury} Injury Location: {query.injury_location}. {query.text}"
+
 
     if query.model not in models:
         return {"error": "model not found."}
 
+
     model = models[query.model]
     return {"query": text, "response": model.query(text)}
 
+
+import uuid
+
+@app.get("/create/uuid4")
+async def generate_uuid4():
+    return uuid.uuid4()
 
 @app.post("/rag/query/stream")
 async def rag_query_steam(query: Query):
@@ -173,10 +182,8 @@ async def rag_query_steam(query: Query):
     if query.model not in models:
         return {"error": "model not found."}
 
-    model = models[query.model]
-
+    model = models['openai']
     return StreamingResponse(model.stream_query(text), media_type="text/event-stream")
-
 
 class FlowQuery(BaseModel):
     flow: str
@@ -192,10 +199,14 @@ async def rag_flow(flow_query: FlowQuery):
     if flow_query.model not in models:
         return {"error": "model not found."}
 
+
     flow = FlowType(flow_query.flow)
     model = models[flow_query.model]
 
-    return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "flow": flow.value, "response": model.flow_query(flow_query.injury, flow_query.injury_location, flow)}
+    response = model.flow_query(flow_query.injury, flow_query.injury_location, flow)
+
+
+    return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "flow": flow.value, "response": response}
 
 
 class MultiFlowQuery(BaseModel):
@@ -204,7 +215,6 @@ class MultiFlowQuery(BaseModel):
     injury_location: str
     model: str
 
-import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent.futures
 
@@ -236,7 +246,7 @@ async def rag_flow(flow_query: MultiFlowQuery):
     model = models[flow_query.model]
 
     coroutine = generate_flows(flow_query.injury, flow_query.injury_location, flows, model)
-    print(coroutine)
+    #print(coroutine)
 
     return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "responses": coroutine}
 

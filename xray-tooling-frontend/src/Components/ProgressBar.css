@@ -1,0 +1,87 @@
+.stepper-wrapper {
+    height: 80px;
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+  }
+  .stepper-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  
+    @media (max-width: 768px) {
+      font-size: 12px;
+    }
+  }
+  
+  .stepper-item::before {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #ccc;
+    width: 100%;
+    top: 20px;
+    left: -50%;
+    z-index: 2;
+  }
+  
+  .stepper-item::after {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #ccc;
+    width: 100%;
+    top: 20px;
+    left: 50%;
+    z-index: 2;
+  }
+  
+  .stepper-item .step-counter {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ccc;
+    margin-bottom: 6px;
+  }
+  
+  .stepper-item.active {
+    font-weight: bold;
+  }
+
+  .stepper-item.active .step-counter {
+    background-color: #4bb543;
+}
+  
+  .stepper-item.completed .step-counter {
+    background-color: #4bb543;
+  }
+  
+  .stepper-item.completed::after {
+    position: absolute;
+    content: "";
+    border-bottom: 2px solid #4bb543;
+    width: 100%;
+    top: 20px;
+    left: 50%;
+    z-index: 3;
+  }
+  
+  .stepper-item:first-child::before {
+    content: none;
+  }
+  .stepper-item:last-child::after {
+    content: none;
+  }
+
+  .arrow{
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+  }

@@ -1,0 +1,11 @@
+.page-body{
+  background-image: url('./doctorPhoto.jpg');
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Scale the image to cover the div */
+}
+
+#title{
+  margin-right: '40%';
+  font-weight:  'bolder';
+}
