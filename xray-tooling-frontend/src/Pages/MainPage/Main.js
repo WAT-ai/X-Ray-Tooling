@@ -57,7 +57,7 @@ const Main = () => {
         <div class="h-screen w-full flex flex-col">
             <NavBar /> 
             <ProgressBar stage={stage} />
-            <div class="flex-grow overflow-auto">
+            <div class="flex-grow overflow-visible">
                 <RenderStage />
             </div>
         </div>

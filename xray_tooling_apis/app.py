@@ -148,6 +148,8 @@ models = {"cohere": chat_cohere, "openai": chat_openai}
 
 class Query(BaseModel):
     text: str
+    injury: str
+    injury_location: str
     model: str
 
 
@@ -169,12 +171,14 @@ async def rag_query_steam(query: Query):
     # return run_similarity_search(qu)
 
     text = query.text
+    injury = query.injury
+    injury_location = query.injury_location
 
     if query.model not in models:
         return {"error": "model not found."}
 
     model = models['openai']
-    return StreamingResponse(model.stream_query(text), media_type="text/event-stream")
+    return StreamingResponse(model.stream_query(text, injury, injury_location), media_type="text/event-stream")
 
 class FlowQuery(BaseModel):
     flow: str
@@ -194,7 +198,6 @@ async def rag_flow(flow_query: FlowQuery):
     model = models[flow_query.model]
 
     return {"injury": flow_query.injury, "injury_location": flow_query.injury_location, "flow": flow.value, "response": model.flow_query(flow_query.injury, flow_query.injury_location, flow)}
-
 
 class MultiFlowQuery(BaseModel):
     flows: list[str]

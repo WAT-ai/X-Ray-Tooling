@@ -1,0 +1,11 @@
+@keyframes throbbing {
+  0% { border-color: rgba(0, 128, 0, 0.2); }
+  50% { border-color: rgba(0, 128, 0, 0.6); }
+  100% { border-color: rgba(0, 128, 0, 0.2); }
+}
+
+.throbbing-border {
+  border: green 2px solid;
+  border-radius: 3px;
+  animation: throbbing 2s infinite;
+}

@@ -18,6 +18,13 @@ from RAG.flows import FlowType, Flow
 import langchain
 from operator import itemgetter
 import asyncio
+from langchain.chains.prompt_selector import ConditionalPromptSelector, is_chat_model
+from langchain.prompts import PromptTemplate
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+)
 
 
 
@@ -115,7 +122,7 @@ class Chat():
     
     
     
-    async def stream_query(self, query):
+    async def stream_query(self, query, injury: str, injury_location: str):
         """
         Stream a query using OpenAI's language model.
 
@@ -135,7 +142,41 @@ class Chat():
         self.__client = ChatOpenAI(
                 temperature=0, openai_api_key=self.__key, verbose=True, model="gpt-4-0125-preview", streaming=True, callbacks=[callback])
         
-        chain = load_qa_chain(self.__client, chain_type="stuff", verbose=True)
+
+        prompt_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+        {context}
+
+        Question: {question}
+        Helpful Answer:"""
+        PROMPT = PromptTemplate(
+            template=prompt_template, input_variables=["context", "question", "injury", "injury_location"]
+        )
+
+        system_template = """You are a medical expert. Given an injury, injury location, and medical documents on injuries, 
+        you will provide. \n\n Do not state 'Based on the medical documents provided' or anything of the sort. 
+        Do not state the phrase 'After reviewing your medical documents...', 
+        you must instead provide your answer the way an automated doctor would provide an 
+        answer to the patient. Do not provide an introductory sentence, just jump straight to the 
+        diagnosis and required information. No need for overall either. Make sure your answer is concise, 
+        clear, and informative.
+        ----------------
+        injury: {injury}
+        injury location: {injury_location}
+        documents: {context}"""
+        messages = [
+            SystemMessagePromptTemplate.from_template(system_template),
+            HumanMessagePromptTemplate.from_template("{question}"),
+        ]
+        CHAT_PROMPT = ChatPromptTemplate.from_messages(messages)
+
+
+        PROMPT_SELECTOR = ConditionalPromptSelector(
+            default_prompt=PROMPT, conditionals=[(is_chat_model, CHAT_PROMPT)]
+        )
+
+        chain = load_qa_chain(self.__client, chain_type="stuff", verbose=True, prompt=PROMPT_SELECTOR.get_prompt(self.__client))
+
 
         async def wrap_done(fn, event):
             try:
@@ -147,7 +188,7 @@ class Chat():
 
         task = asyncio.create_task(
             wrap_done(
-                chain.ainvoke(input={"input_documents":docs, "question":query}),
+                chain.ainvoke(input={"input_documents":docs, "question":query, "injury": injury, "injury_location": injury_location}),
                 callback.done
             )
         )
@@ -157,18 +198,16 @@ class Chat():
             buffer += token
             if " " in buffer:
                 word, buffer = buffer.rsplit(" ", 1)
-                print(f"data: {word}")
                 yield f"data: {word}\n\n"
 
         if buffer:
-            print(f"data: {buffer}")
             yield f"data: {buffer}\n\n"
 
         await task      
 
         # Yield the docs content
         for doc in docs:
-            yield f"doc: {doc.page_content}\n\n"
+            yield f"data: doc-content: {doc.page_content}\n\n"
 
 
     def flow_query(self, injury: str, injury_location: str, flow: FlowType) -> object:
@@ -235,11 +274,9 @@ class Chat():
             buffer += token
             if " " in buffer:
                 word, buffer = buffer.rsplit(" ", 1)
-                print(f"data: {word}")
                 yield f"data: {word}\n\n"
 
         if buffer:
-            print(f"data: {buffer}")
             yield f"data: {buffer}\n\n"
 
         await task  

@@ -4,9 +4,10 @@ import Response from './Response';
 
 function RequestResponse({ queryObject, queryResponse, flowResponse, removeRequest, index }) {
 
-    const { request, status, response } = queryObject;
+    const { request, response, status } = queryObject;
     const { flow, requestType } = request;
-    const responseData = requestType === 'flow' ? flowResponse[flow]?.data : response;
+    const responseData = requestType === 'flow' ? flowResponse[flow]?.data : response.data;
+    const responseDocs = requestType === 'flow' ? flowResponse[flow]?.docs : response.docs;
 
 
 
@@ -14,7 +15,7 @@ function RequestResponse({ queryObject, queryResponse, flowResponse, removeReque
     return (
         <div>
             <Request requestObj={queryObject.request} removeRequest={removeRequest} index={index}/>
-            <Response responseObj={responseData} />
+            <Response responseData={responseData} responseDocs={responseDocs} status={status}/>
         </div>
     );
 }
