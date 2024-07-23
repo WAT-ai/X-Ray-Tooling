@@ -126,7 +126,7 @@ class Chat():
             AsyncGenerator: Each token yielded for streamingResponse
         """
 
-        rag_docs = self.__embedding.get_similar_documents(query)
+        1 = self.__embedding.get_similar_documents(query)
 
         docs = [Document(page_content=doc[2], metadata={
                          "chunk": doc[1], "source": "local"}) for doc in rag_docs]
