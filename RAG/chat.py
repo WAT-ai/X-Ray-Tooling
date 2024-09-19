@@ -96,6 +96,7 @@ class Chat():
                 dataset_path=dataset_path
             )
         else:
+            print("Using Raptor Embedding")
             self.__embedding = RaptorEmbedding(dataset_path=dataset_path)
 
     def query(self, query) -> str:
@@ -210,6 +211,7 @@ class Chat():
         flow_query = Flow.template(injury, injury_location, flow)
 
         rag_docs = self.__embedding.get_similar_documents(flow_query, rerank=False)
+        print('rag docs')
         print(rag_docs)
         #  docs = [Document(page_content=doc[2], metadata={
         #                   "chunk": doc[1], "source": "local"}) for doc in rag_docs]
@@ -241,11 +243,9 @@ class Chat():
             buffer += token
             if " " in buffer:
                 word, buffer = buffer.rsplit(" ", 1)
-                print(f"data: {word}")
                 yield f"data: {word}\n\n"
 
         if buffer:
-            print(f"data: {buffer}")
             yield f"data: {buffer}\n\n"
 
         await task  

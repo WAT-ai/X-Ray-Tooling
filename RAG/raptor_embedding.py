@@ -148,22 +148,26 @@ class RaptorEmbedding(Embedding):
 
             self.__tree_db = vector_db
 
-    def get_similar_documents(self, query_text, top_n=5, search_kwargs=20, rerank=True):
+    def get_similar_documents(self, query_text, top_n=5, search_kwargs=20, rerank=False):
         if rerank:
             print("Reranking documents...")
+            print("Running Raptor")
             return self.__rerank(query_text, top_n=top_n,
                                  search_kwargs=search_kwargs)
 
         return self.__tree_db.similarity_search(query_text)
 
     def __rerank(self, prompt, top_n=5, search_kwargs=20):
+        print("prompt")
+        print(prompt)
         model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
         compressor = CrossEncoderReranker(model=model, top_n=top_n)
         compression_retriever = ContextualCompressionRetriever(
             base_compressor=compressor, base_retriever=self.__tree_db.as_retriever(search_kwargs={"k": search_kwargs}))
 
         compressed_docs = compression_retriever.invoke(prompt)
-
+        print("compressed docs")
+        print(compressed_docs)
         return compressed_docs
 
     def clear(self):

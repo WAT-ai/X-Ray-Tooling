@@ -278,6 +278,7 @@ class IndexEmbedding(Embedding):
         Returns:
             list: A sorted list of tuples containing similarity scores, indices, and text chunks.
         """
+        print("Running Index")
         embeddings, _ = self.__retrieve_vector_index()
         if self.__use_openai:
             # Logic for OpenAI embeddings

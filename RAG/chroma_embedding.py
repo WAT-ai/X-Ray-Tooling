@@ -165,6 +165,7 @@ class ChromaEmbedding(Embedding):
         """
         if rerank:
             print("Reranking documents...")
+            print("Running Chroma")
             return self.__rerank(query_text, top_n=top_n,
                                  search_kwargs=search_kwargs)
 
